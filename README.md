@@ -1,4 +1,4 @@
-# HOME
+# Tire-Modeling-and-Parameter-Fitting
 
 ## 架構與使用方法
 [擬合主控腳本](/introduction/fitting.md) : 執行後馬上會進行所有程序，如果需要擬合其他內容，主要需要更新數據、檔名、路徑位址即可。原先檔案皆使用相對路徑，但並不公開原始資料權限，可以依照說明文件了解檔案位置。
