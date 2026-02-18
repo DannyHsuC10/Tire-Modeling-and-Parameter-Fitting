@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula 分段擬合主程式說明
 
 本程式為輪胎 **Magic Formula (MF)** 模型擬合主控腳本，負責：

@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Data Comparator 使用說明
 
 ## 專案位置

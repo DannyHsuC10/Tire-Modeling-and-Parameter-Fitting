@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Data Filter JSON 設定說明
 >[json檔案位置](../Filtering_Limits_stage_example.json)，因為數據不能公開的問題，這個是隨機產生參數的範立檔案使用時需要修改成正確數值。
 ## 📌 目的

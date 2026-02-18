@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula Fy
 模型位置>> [Fy](../Fy_models.py)
 ## 純側滑橫向力 $Fy0$

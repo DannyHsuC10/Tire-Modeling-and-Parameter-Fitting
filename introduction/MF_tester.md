@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula (MF) 測試器與曲面視覺化工具
 
 本模組目標：

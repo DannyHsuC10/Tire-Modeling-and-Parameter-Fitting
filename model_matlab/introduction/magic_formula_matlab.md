@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # MATLAB Magic Formula API 說明文件
 
 ## 📌 模型定位

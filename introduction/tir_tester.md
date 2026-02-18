@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula 模型比較與結果視覺化工具
 
 [本模組](../tir_tester.py)用於：

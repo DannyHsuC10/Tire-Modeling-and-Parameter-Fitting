@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula 模型
 
 ## 模型定位

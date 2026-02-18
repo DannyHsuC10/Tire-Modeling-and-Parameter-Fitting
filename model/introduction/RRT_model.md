@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula 模型計算說明 (滾動阻力矩 $RRT$)
 模型位置>> [RRT](../RRT_models.py)
 

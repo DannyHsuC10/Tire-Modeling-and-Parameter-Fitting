@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula Mx
 
 模型位置>> [Mx](../Mx_models.py)

@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula Mz
 模型位置>> [Mz](../Mz_models.py)
 

@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula 基類
 模型位置>> [common](../_common.py)
 ## 歸一化法向力 `_normalize_load`

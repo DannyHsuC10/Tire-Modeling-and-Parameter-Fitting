@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # Magic Formula Fx
 模型位置>> [Fx](../Fx_models.py)
 ## 純縱滑縱向力 $Fx0$

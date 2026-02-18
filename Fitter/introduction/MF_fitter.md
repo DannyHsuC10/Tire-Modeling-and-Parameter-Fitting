@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # MF_fitter 
 [檔案位置](../MF_fitter.py)
 ## 1. 擬合概念說明

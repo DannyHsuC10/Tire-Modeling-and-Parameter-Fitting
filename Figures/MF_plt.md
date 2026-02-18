@@ -1,3 +1,7 @@
+---
+layout: base
+---
+
 # 資料比較
 > 本檔案由python 自動更新，請不要進行md編輯。圖表會由[MF測試器輸出](../introduction/MF_tester.md)執行自動更新。
 ## 摩擦圓
