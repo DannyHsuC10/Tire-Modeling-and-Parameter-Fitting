@@ -26,10 +26,10 @@
 
 ## 2. 資料過濾
 > 主要需要更動的檔案 : 
->1. [json檔](filter/introduction/json.md)過濾條件 : 這裡是用來改清理資料的條件用的
->1. [filter](filter/introduction/Filter.md) 過濾器 : 過濾資料並整理要用的東西。如果檔名和路徑有改這邊需要更新
+>1. [json檔](Filter/introduction/json.md)過濾條件 : 這裡是用來改清理資料的條件用的
+>1. [filter](Filter/introduction/Filter.md) 過濾器 : 過濾資料並整理要用的東西。如果檔名和路徑有改這邊需要更新
 
-* [資料比較圖](figures/data_comparison.md) : 點下去就可以看，用[data comparator](filter/introduction/data_comparator.md)可以更新資料，想看什麼自行調整。(但因為數據不外流沒有開放圖形資料，執行後會自動更新)
+* [資料比較圖](Figures/data_comparison.md) : 點下去就可以看，用[data comparator](Filter/introduction/data_comparator.md)可以更新資料，想看什麼自行調整。(但因為數據不外流沒有開放圖形資料，執行後會自動更新)
 ## 3. 輪胎模型
 > 主要需要更動的檔案 : 
 > 1. [MF 測試器](/introduction/MF_tester.md) : 可以方便看出不同輪胎參數、輸入輸出，進行比較和分析，用高度模組化的物件出圖。可以很快的了解模型趨勢。
