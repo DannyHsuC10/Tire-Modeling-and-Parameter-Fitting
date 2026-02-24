@@ -7,7 +7,7 @@
 * 執行 : 資料處理>>輪胎模型>>擬合>>驗證>>出tir檔案
 ## 整體簡介
 連接皆可以連接到對應的程式碼位置，這邊僅對資料夾進行大方向說明。
-1. data : 所有數據資料，主要不公開詳細請見[all data](data/introduction/all_data.md)
+1. data : 所有數據資料，主要不公開詳細請見 [all data](data/introduction/all_data.md)
 1. Figures : png圖片，因為關係數據內容不公開
 1. Filebkp : 重要文件保護區(應該無法看到這個資料夾)
 1. Filter : 過濾data資料>>給Fitter用
