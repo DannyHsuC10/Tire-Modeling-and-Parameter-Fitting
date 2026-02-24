@@ -3,7 +3,8 @@ layout: base
 ---
 
 # 批次轉換 `.mat` 檔案為 Excel 與 CSV
-檔案位置>>[link](../data/mat_to_csv_excel.m)
+檔案位置(主要轉換工具轉比較快)>>[link](../data/mat_to_csv_excel.m)
+
 ## 功能概述
 這份 MATLAB 腳本的主要目的，是 **自動化批次處理資料夾中的 `.mat` 檔案**，並將其中的變數轉換成 **Excel (`.xlsx`) 與 CSV (`.csv`) 格式**，以便後續資料分析與處理。
 
@@ -53,3 +54,8 @@ layout: base
 1. 將所有 `.mat` 檔案放入 `mat` 資料夾。  
 2. 按run執行此腳本。  
 3. 在 `csv` 與 `excel` 資料夾中取得轉換後的檔案。  
+
+## 另外方案
+如果遇到matlab判斷資料結構不同或有其他問題可以使用以下工具，轉換時間會長很多但通用性更高，如果數愈多需要慢慢等待。
+
+[**備用工具**](../converter.py)
