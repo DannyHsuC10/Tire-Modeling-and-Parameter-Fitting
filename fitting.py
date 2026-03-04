@@ -197,7 +197,7 @@ if  Fit_type == "FY":
     STAGES = STAGES_FY
 elif Fit_type == "FX":
     STAGES = STAGES_FX
-
+mf_params_current = mf_params.copy()  # 初始參數
 # ===========================================================================(分段擬合)
 for stage_num in selected_stages:
 
@@ -213,8 +213,7 @@ for stage_num in selected_stages:
     F_meas=F_sub[Fit_type]
 
     # 建立 fitter
-    mf_params_current = mf_params.copy()  # 初始參數
-    mf_params.copy()  # 初始參數
+    
     fitter = MF_Fitter(out = Fit_type,fit_params = None)  # 先建立空的，後面會傳入每次的 fit_params
 
     print(f"\n=== Stage {stage_num} 擬合開始 ===")
