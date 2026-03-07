@@ -172,3 +172,7 @@ Mz = MF_api("Mz", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
 | persistent     | instance cache      |
 | struct         | dataclass           |
 | 直接呼叫函式         | class static method |
+
+## 改進方向
+* 效率有待提升，目前計算速度真的太慢。
+* 多加一些畫圖工具
