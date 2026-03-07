@@ -18,7 +18,7 @@ MF_api(cmd, FZ, SA, SL, IA, P, mf_file)
 讓使用者只需：
 
 ```
-MF_api("Fx", ...)
+MF_api("FX", ...)
 ```
 
 即可取得結果，而不需理解內部所有公式細節。計算結果與python版本幾乎相同，所以這部分主要介紹使用方法。
@@ -68,10 +68,10 @@ function out = MF_api(cmd, FZ, SA, SL, IA, P, mf_file)
 
 | cmd    | 回傳   |
 | ------ | ---- |
-| `"Fx"` | 縱向力  |
-| `"Fy"` | 橫向力  |
-| `"Mz"` | 回正力矩 |
-| `"Mx"` | 翻轉力矩 |
+| `"FX"` | 縱向力  |
+| `"FY"` | 橫向力  |
+| `"MZ"` | 回正力矩 |
+| `"MX"` | 翻轉力矩 |
 
 ##  CalculationInput 功能
 
@@ -157,11 +157,11 @@ MF.lambdaMuxMi = 1;
 ## 📊 使用範例
 
 ```matlab
-Fx = MF_api("Fx", 800, 0.0, 0.1, 0.0, 80000, "MF612.tir");
+Fx = MF_api("FX", 800, 0.0, 0.1, 0.0, 80000, "MF612.tir");
 
-Fy = MF_api("Fy", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
+Fy = MF_api("FY", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
 
-Mz = MF_api("Mz", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
+Mz = MF_api("MZ", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
 ```
 
 ## 與 Python 版本差異
