@@ -15,6 +15,9 @@ Figures/*.png
 *.bak
 *.swp
 
+# 保密資料
+*.tir
+
 # 系統檔案
 .DS_Store
 Thumbs.db
