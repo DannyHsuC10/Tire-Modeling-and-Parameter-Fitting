@@ -32,7 +32,7 @@ function MF = CalculationInput(FZ,SA,SL,IA,P,tir) % 創建輸入(修改模型降
     MF.V = tir.LONGVL;  
     % 固定參數
     MF.lambdaFzo=1;        %λFzo   (nominal (rated) load) 
-    MF.lambdaMuyMi=0.6;      %λμy*   (peak friction coefficient) 這之後實際使用要改0.6
+    MF.lambdaMuyMi=1;      %λμy*   (peak friction coefficient) 這之後實際使用要改0.6
     MF.lambdyMuyPrime=1;   %λμy'   (peak friction coefficient)
     MF.lambdaKya=1;        %λKya   (cornering stiffness)
     MF.lambdaCy=1;         %λCy    (shape factor)
@@ -51,7 +51,7 @@ function MF = CalculationInput(FZ,SA,SL,IA,P,tir) % 創建輸入(修改模型降
     MF.lambdaMuxPrime=1;
     MF.lambdaKxk=1;
     MF.lambdaEx=1;
-    MF.lambdaMuxMi=0.6; % 這之後實際使用要改0.6
+    MF.lambdaMuxMi=1; % 這之後實際使用要改0.6
     MF.lambdaCx=1;
     MF.lambdaXa=1;
     MF.lambdaVMX = 1;

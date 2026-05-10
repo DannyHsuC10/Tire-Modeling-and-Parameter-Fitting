@@ -7,7 +7,6 @@ function Mz = MF612_Mz(MF)
     pressure=MF.pressure;
     Ro=MF.Ro;
     Fx=MF612_Fx(MF);
-    Fy=MF612_Fy(MF);
     % 處理FZ數據
     Fzo=MF.FZO;                %額定負載，以廠商提供為主，沒有的話就全部fz加起來平均
     FzoPrime=MF.lambdaFzo.*Fzo;        %(4.E1)Fzo'
@@ -23,7 +22,7 @@ function Mz = MF612_Mz(MF)
     iaMi2=iaMi.^2;
     % 處理v數據
     Vcx=MF.V;
-    Vcy = -Vcx.*tan(a);%.*(pi/180));% (4.E3)lambdyMuyPrime
+    Vcy = -Vcx.*tan(a.*(pi/180));% (4.E3)
     sgnVcx = sign(Vcx);% (4.E6a)
     Vc = sqrt(Vcx.^2 + Vcy.^2);
     Vc = Vc + eps(Vc);% (4.E6)
@@ -41,6 +40,7 @@ function Mz = MF612_Mz(MF)
     
     Shy=(MF.PHY1+MF.PHY2.*dfz).*MF.lambdaHy+((Kyiao.*iaMi-Svyia).*MF.zeta0./(Kya+MF.epsilonK))+MF.zeta4-1;%(4.E27)
     
+    ay=ami+Shy;%(4.E20)
     
     Cy=MF.PCY1.*MF.lambdaCy;%(4.E21) >0
     
@@ -48,11 +48,39 @@ function Mz = MF612_Mz(MF)
     Dy=muy.*Fz.*MF.zeta2;%(4.E22)
     
     
+    Ey=(MF.PEY1+MF.PEY2.*dfz).*(1+MF.PEY5.*iaMi2-(MF.PEY3+MF.PEY4.*iaMi).*sign(ay)).*MF.lambdaEy;%(4.E24)<=1
+    
     By=Kya./(Cy.*Dy+MF.epsilonY);%(4.E26)
     
     
     Svy=Fz.*(MF.PVY1+MF.PVY2.*dfz).*MF.lambdaVy.*MF.lambdyMuyPrime.*MF.zeta2+Svyia;%(4.E29)
-
+    
+    %(4.E19)final result=Fy0(pure side slip)
+    Fy0=Dy.*sin(Cy.*atan(By.*ay-Ey.*(By.*ay-atan(By.*ay))))+Svy;
+    %% Full formula set(lateral force combine slip)
+    
+    
+    Byk = (MF.RBY1+MF.RBY4*iaMi.^2).*cos(atan(MF.RBY2.*(ami-MF.RBY3))).*MF.lambdaYk;% (4.E62)
+    
+    Cyk = MF.RCY1;% (4.E63)
+    
+    DVyk = muy.*Fz.*(MF.RVY1+MF.RVY2.*dfz+MF.RVY3*iaMi).*cos(atan(MF.RVY4.*ami)).*MF.zeta2;% (4.E67)
+    
+    Eyk = MF.REY1+MF.REY2.*dfz;% (4.E64)
+    
+    SHyk = MF.RHY1+MF.RHY2.*dfz;% (4.E65)
+    
+    
+    SVyk = DVyk.*sin(MF.RVY5.*atan(MF.RVY6.*sl)).*MF.lambdaVyk;% (4.E66)
+    
+    
+    kappaS = sl + SHyk;% (4.E61)
+    
+    Gyk0 = cos(Cyk.*atan(Byk.*SHyk-Eyk.*(Byk.*SHyk-atan(Byk.*SHyk))));% (4.E60)
+    
+    Gyk = cos(Cyk.*atan(Byk.*kappaS-Eyk.*(Byk.*kappaS-atan(Byk.*kappaS))))./Gyk0;% (4.E59)
+    
+    Fy = Gyk.*Fy0 + SVyk;% (4.E58)
     %% Full formula set(Aligning Torque pure side slip)
     Br=(MF.QBZ9.*MF.lambdaKya./MF.lambdaMuyMi+MF.QBZ10.*By.*Cy).*MF.zeta6;%(4.E45)
     
@@ -69,6 +97,7 @@ function Mz = MF612_Mz(MF)
     
     ar=ami+Shf;%(4.E37)
     
+    Mzro=Dr.*cos(Cr.*atan(Br.*ar)).*cosPrimea;%(4.E36)
     
     Sht=MF.QHZ1+MF.QHZ2.*dfz+(MF.QHZ3+MF.QHZ4.*dfz).*iaMi;%(4.E35)
     
@@ -84,10 +113,38 @@ function Mz = MF612_Mz(MF)
     
     %這裡的(1)是sgn(Vx)，同樣沒有往後轉的測試所以用1代替
     Dt=Dto.*(1+MF.QDZ3.*abs(iaMi)+MF.QDZ4.*iaMi2).*MF.zeta5;%(4.E43)
-       
+    
+    Kziao=Fz.*Ro.*(MF.QDZ8+MF.QDZ9.*dfz).*(1+MF.PPZ2.*dpi).*MF.lambdaKzia.*MF.lambdaMuyMi-Dto.*Kyiao;%(4.E49)
+    
+    Kzao=Dto.*Kya;%(4.E48)
+    
+    to=Dt.*cos(Ct.*atan(Bt.*at-Et.*(Bt.*at-atan(Bt.*at)))).*cosPrimea;%(4.E33)
+    %(1)=cos'(a)，為了因應往後轉的狀況所以導入輪心速度和前進速度比值(類似滑移率)，理論上測試流程不會有往後轉的狀況所以省略
+    
+    MzoPrime=-to.*Fy0;%(4.E32)
+    
+    Mz0=MzoPrime+Mzro;%(4.E31)
+    
     %% Full formula set(lateral force pure side slip)
+    Shx=(MF.PHX1+MF.PHX2.*dfz).*MF.lambdaHx;%(4.E17)
+    
+    kappax=sl+Shx;%(4.E10)
+    
+    Svx=Fz.*(MF.PVX1+MF.PVX2.*dfz).*MF.lambdaVx.*MF.lambdaMuxPrime.*MF.zeta1;%(4.E18)
     
     Kxk=Fz.*(MF.PKX1+MF.PKX2.*dfz).*exp(MF.PKX3.*dfz).*(1+MF.PPX1.*dpi+MF.PPX2.*dpi2).*MF.lambdaKxk;%(4.E15)
+    
+    Ex=(MF.PEX1+MF.PEX2.*dfz+MF.PEX3.*(dfz.^2)).*(1-MF.PEX4.*sign(kappax)).*MF.lambdaEx;%(4.E14)cosPrimea
+    
+    mux=(MF.PDX1+MF.PDX2.*dfz).*(1+MF.PPX3.*dpi+MF.PPX4.*dpi2).*(1-MF.PDX3.*(ia.^2)).*MF.lambdaMuxMi;%(4.E13)
+    
+    Dx=mux.*Fz.*MF.zeta1;%(4.E12)
+    
+    Cx=MF.PCX1.*MF.lambdaCx;%(4.E11)
+    
+    Bx=Kxk./(Cx.*Dx+MF.epsilonX);%(4.E16)
+    
+    Fx0=Dx.*sin(Cx.*atan(Bx.*kappax-Ex.*(Bx.*kappax-atan(Bx.*kappax))))+Svx;%(4.E9)
     
     kappa2 = sl.^2;
     KxkKya2 = (Kxk./KyaPrime).^2;
@@ -104,13 +161,13 @@ function Mz = MF612_Mz(MF)
     
     s = Ro.*(MF.SSZ1+MF.SSZ2.*(Fy/FzoPrime)+(MF.SSZ3+MF.SSZ4.*dfz).*iaMi).*MF.lambdaS;% (4.E76)
     
-    Mzr = Dr.*cos(Cr.*atan(Br.*alpharEq)).*sgnVcx;% (4.E75)
+    Mzr = Dr.*cos(Cr.*atan(Br.*alpharEq)).*1;% (4.E75)
     
+    Fy_ = Gyk.*Fy0;% (4.E74)
     
-    t = Dt.*cos(Ct.*atan(Bt.*alphatEq-Et.*(Bt.*alphatEq-atan(Bt.*alphatEq)))).*sgnVcx;% (4.E73) Pneumatic trail
+    t = Dt.*cos(Ct.*atan(Bt.*alphatEq-Et.*(Bt.*alphatEq-atan(Bt.*alphatEq)))).*1;% (4.E73) Pneumatic trail
     
-    Mz_ = -t.*Fy;% (4.E72)
+    Mz_ = -t.*Fy_;% (4.E72)
     
     Mz = Mz_ + Mzr + s.*Fx;% (4.E71)
-    
 end
