@@ -185,9 +185,10 @@
   },
   "active": "e0387aa5990dedf8",
   "lastOpenFiles": [
+    "introduction/fitting.md",
+    "README.md",
     "model/introduction/magic_formula_model.md",
     "model/introduction/Fx_model.md",
-    "README.md",
     "Filter/introduction/Filter.md",
     "Filter/introduction/json.md",
     "data/introduction/all_data.md",
@@ -197,7 +198,6 @@
     "Figures/data_comparison.md",
     "Figures/MF_plt.md",
     "data/introduction/mat_to_excel_csv.md",
-    "Filter/introduction/data_comparator.md",
-    "introduction/fitting.md"
+    "Filter/introduction/data_comparator.md"
   ]
 }
