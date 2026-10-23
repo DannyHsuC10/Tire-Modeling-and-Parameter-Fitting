@@ -4,8 +4,8 @@ tir_params = tire.load_tir("D2704_mf612.tir") # 載入tir參數檔案
 
 MF = tire.CalculationInput( # 建立MF物件函數
             FZ=800,
-            SA=1,
-            SL=0.25,
+            SA=0.0,
+            SL=0.0,
             IA=0.0,
             V = 10,
             pressure=80000,

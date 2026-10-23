@@ -27,6 +27,6 @@ print("Fy:", Fy)
 ## 其他小工具
 本模組是輪胎擬合模組magic formula fitting中的精簡工具，這個資料夾中只擷取部分內容
 
-1. [圖形測試器](/Pacejka_MF_model/introduction/MF_tester.md) : 用於簡單分析輪胎性能。
-2. [測試結果圖表](/Pacejka_MF_model/Figures/MF_plt.md) : 上個工具的輸出結果，執行之後就會自動更新。
-3. [輪胎模型](/Pacejka_MF_model/introduction/magic_formula_model.md) : 輪胎模型說明，如果想了解模組運作可以看這個。
+1. [圖形測試器](introduction/MF_tester.md) : 用於簡單分析輪胎性能。
+2. [測試結果圖表](Figures/MF_plt.md) : 上個工具的輸出結果，執行之後就會自動更新。
+3. [輪胎模型](introduction/magic_formula_model.md) : 輪胎模型說明，如果想了解模組運作可以看這個。

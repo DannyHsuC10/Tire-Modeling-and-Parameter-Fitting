@@ -5,13 +5,17 @@
 - 比較曲面差異
 - 摩擦圓判斷
 
-
-還有優化空間，圖片產生時沒有用到MF擬和模型的特性
-MF模型有辦法直接輸入矩陣輸出力量矩陣，並不需要大量迴圈疊帶
+還有優化空間,圖片產生時沒有用到MF擬和模型的特性
+MF模型有辦法直接輸入矩陣輸出力量矩陣,並不需要大量迴圈疊帶
 """
 
-from model._common import CalculationInput
-from model.api import calculate_fx, calculate_fy,load_tir, MF_Universal_solver
+if __name__ == "__main__":
+    from model._common import CalculationInput
+    from model.api import calculate_fx, calculate_fy,load_tir, MF_Universal_solver
+else:
+    from Pacejka_tire_model.model._common import CalculationInput
+    from Pacejka_tire_model.model.api import calculate_fx, calculate_fy,load_tir, MF_Universal_solver
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import numpy as np
@@ -22,7 +26,7 @@ base_dir = Path(__file__).resolve().parent  # magic_formula/
 # 解出曲面
 Slip_range = np.linspace(-1, 1, 50)
 Slip_fix = 0.1# 原先預設
-alpha_range = np.linspace(-15, 15, 50)
+alpha_range = np.linspace(-20, 20, 50)
 alpha_fix = 6
 Fz_range = np.linspace(0, 2000, 50)
 Fz_fix = 800
@@ -136,7 +140,7 @@ def plot_tire_surfaces(out, fix, tir_params_list, labels=None, save_plt = False)
         plt.show()
 
 # 摩擦圓判斷
-def plot_friction_circle_vs_kappa_surface(Fz=800, pressure=82319, alpha_lim=10, kappa_lim=0.25, tir_params=None, IA=0.0):
+def plot_friction_circle_vs_kappa_surface(Fz=800, pressure=82319, alpha_lim=10, kappa_lim=0.25, tir_params=None, IA=0.0, show_plot=True):
     """
     Fx-Fy 摩擦圓隨滑移率 κ 變化
     z 軸為滑移率 κ
@@ -184,11 +188,13 @@ def plot_friction_circle_vs_kappa_surface(Fz=800, pressure=82319, alpha_lim=10, 
     ax.set_zlabel('Slip Ratio κ')
     ax.set_title(title)
     fig.savefig(title, dpi=300, bbox_inches='tight')
+    print(f"Friction_Circle_vs_Slip_Ratio_face saved to Figures folder")
     fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
     plt.tight_layout()
-    plt.show()
+    if show_plot:
+        plt.show()
 
-def plot_friction_circle_vs_kappa_curves(Fz=800, pressure=82319, alpha_lim=10, kappa_lim=0.25, tir_params=None, IA=0.0):
+def plot_friction_circle_vs_kappa_curves(Fz=800, pressure=82319, alpha_lim=10, kappa_lim=0.25, tir_params=None, IA=0.0, show_plot=True):
     alpha_range = np.linspace(-alpha_lim, alpha_lim, 200)  # 側滑角
     kappa_range = np.linspace(-kappa_lim, kappa_lim, 200)  # 滑移率
 
@@ -225,10 +231,12 @@ def plot_friction_circle_vs_kappa_curves(Fz=800, pressure=82319, alpha_lim=10, k
     ax.set_zlabel('Slip Ratio κ')
     ax.set_title(title)
     fig.savefig(title, dpi=300, bbox_inches='tight')
+    print(f"Friction_Circle_vs_Slip_Ratio_curves saved to Figures folder")
     plt.tight_layout()
-    plt.show()
+    if show_plot:
+        plt.show()
 
-def plot_friction_circle_vs_Fz_surface(kappa=0.1, pressure=82319, alpha_lim=10, Fz_max=2000, tir_params=None, IA=0.0):
+def plot_friction_circle_vs_Fz_surface(kappa=0.1, pressure=82319, alpha_lim=10, Fz_max=1400, tir_params=None, IA=0.0, show_plot=True):
     """
     Fx-Fy 摩擦圓隨正向力 Fz 變化，生成光滑曲面
     z軸為垂直載荷 Fz
@@ -286,11 +294,13 @@ def plot_friction_circle_vs_Fz_surface(kappa=0.1, pressure=82319, alpha_lim=10, 
     ax.set_zlabel('Vertical Load Fz [N]')
     ax.set_title(title)
     fig.savefig(title, dpi=300, bbox_inches='tight')
+    print(f"Friction_Circle_vs_Fz_face saved to Figures folder")
     fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
     plt.tight_layout()
-    plt.show()
+    if show_plot:
+        plt.show()
 
-def plot_friction_circle_vs_Fz_curves(kappa=0.1,alpha_lim=10,Fz_max=2000.0,pressure=82319.0,tir_params=None,IA=0.0):
+def plot_friction_circle_vs_Fz_curves(kappa=0.1,alpha_lim=10,Fz_max=1400.0,pressure=82319.0,tir_params=None,IA=0.0,show_plot=True):
     alpha_list = np.linspace(-alpha_lim, alpha_lim, 400)  # 不同線對應不同 α
     Fz_list = np.linspace(0.0, Fz_max, 50)                # 掃描 Fz
     fig = plt.figure(figsize=(8, 6))
@@ -321,28 +331,42 @@ def plot_friction_circle_vs_Fz_curves(kappa=0.1,alpha_lim=10,Fz_max=2000.0,press
     ax.set_title(title)
     fig.savefig(title, dpi=300, bbox_inches='tight')
     plt.tight_layout()
-    plt.show()
+    if show_plot:
+        plt.show()
+    print(f"Friction_Circle_vs_Fz_curves saved to Figures folder")
     
 
-if __name__ == "__main__":
-    D2704_mf612 = load_tir("D2704_mf612.tir")# 紅心13吋
-    FSAE_43075R20 = load_tir("FSAE_43075R20.tir")# 新的擬合結果
-    """
-    outputs = ['FX', 'FY', 'MX', 'MZ', 'RRT']
-    fix_cases = ['alpha','kappa','Fz']
-    tir_params_list = [FSAE_43075R20]
-    """
-    outputs = ['MZ']
-    fix_cases = ['alpha','kappa','Fz']
-    tir_params_list = [D2704_mf612]
-    #"""
+# ======================================================================
+print("==================================================")
+print("Pacejka_tire_model")
+print("==================================================")
+#if __name__ == "__main__":
 
-    #plot_friction_circle_vs_kappa_surface(tir_params = FSAE_43075R20)
-    #plot_friction_circle_vs_kappa_curves(tir_params = FSAE_43075R20)
-    #plot_friction_circle_vs_Fz_surface(tir_params = FSAE_43075R20)
-    #plot_friction_circle_vs_Fz_curves(tir_params = FSAE_43075R20)
+tire = load_tir("D2704_mf612.tir")# 紅心13吋
+#FSAE_43075R20 = load_tir("FSAE_43075R20.tir")# 新的擬合結果
+#tire = load_tir("tire.tir")# 新的擬合結果
+"""
+outputs = ['FX', 'FY', 'MX', 'MZ', 'RRT']
+fix_cases = ['alpha','kappa','Fz']
+tir_params_list = [tire]
 
-    for out in outputs:
-        for fix in fix_cases:
-            plot_tire_surfaces(out,fix,tir_params_list)
-            print("out : ",out,"  fix : ",fix)
+"""
+outputs = ['FX']
+fix_cases = ['alpha','kappa','Fz']
+tir_params_list = [tire]
+#"""
+
+#plot_friction_circle_vs_kappa_surface(tir_params = tire,show_plot = True)
+#plot_friction_circle_vs_kappa_curves(tir_params = tire,show_plot = True)
+#plot_friction_circle_vs_Fz_surface(tir_params = tire,show_plot = True)
+#plot_friction_circle_vs_Fz_curves(tir_params = tire,show_plot = True)
+
+save_plt = False
+for out in outputs:
+    for fix in fix_cases:
+        plot_tire_surfaces(out,fix,tir_params_list,save_plt = save_plt)
+        if save_plt:
+            plt.close()  #避免記憶體崩潰
+            
+        print("out : ",out,"  fix : ",fix)
+        
