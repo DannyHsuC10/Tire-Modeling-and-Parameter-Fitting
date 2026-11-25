@@ -2,27 +2,27 @@
 layout: base
 ---
 
-# all data (所有資料狀態)
+# Data Overview
 
-## 所有資料架構
+## Data Directory Structure
 
 ```
 data
 ├─ csv
-│  └─ csv(測試資料)
+│  └─ csv (test data)
 ├─ excel
-│  └─ excel(測試資料)
+│  └─ excel (test data)
 ├─ mat
-│  └─ mat(測試資料)
+│  └─ mat (test data)
 ├─ Filtered_data
-│  └─ processed(處理後的資料:1,2,3,4,5 stage)
+│  └─ processed (processed data for stages 1–5)
 ├─ Fitting_data
-│  ├─ Fitting_Limits(擬合上下限)
-│  └─ Fitting_process(擬合過程暫存保護)
+│  ├─ Fitting_Limits (fitting bounds)
+│  └─ Fitting_process (working copy of fitting parameters)
 ├─ tir
-│  └─ tir_Fitting_results(輸出結果)
+│  └─ tir_Fitting_results (fitted output)
 ├─ introduction
-│  └─ 介紹文件不重要
-mat_to_csv_excel(轉檔工具)
-TIR_template(tir範本)
+│  └─ Documentation
+mat_to_csv_excel (conversion tool)
+TIR_template (TIR template)
 ```

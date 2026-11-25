@@ -1,26 +1,26 @@
-# 車輪剛性計算與比較
-* [最終結果](result.md)
+# Vertical Tire Stiffness Calculation and Comparison
+* [Final results](result.md)
 
-## 主要執行腳本
-本工具主要功能為分析輪胎剛性，雖然TTC已經有提供spring rate，但是我們還是可以自行分析看看效果。另外資料處理與資料過濾前兩步驟其實使用與輪胎模型同一個模組，所以使用方法和改進方向是一樣的。
+## Main Script
+This tool estimates vertical tire stiffness independently of the spring rates provided by TTC. Data processing and filtering use the same modules as the tire modeling workflow, so the same usage guidance and improvement plans apply.
 
-主要執行腳本會進行以下步驟 : 
-> 1. 呼叫資料過濾器
-> 2. 進行線性回歸
-> 3. 繪圖並產生結果報告>>[最終結果](result.md)
+The main script performs these steps. 
+> 1. Apply the data filter.
+> 2. Fit a linear regression.
+> 3. Plot the results and generate a [report](result.md).
 
-## 1. 資料處理
-* [mat to csv & excel](data/introduction/mat_to_excel_csv.md) 資料轉換器 : 處理資料轉換成excel和csv
+## 1. Data Processing
+* [MAT to CSV and Excel](data/introduction/mat_to_excel_csv.md) converts MATLAB data to CSV and Excel.
 
-## 2. 資料過濾
+## 2. Data Filtering
 
-1. [json檔](Filter/introduction/json.md)過濾條件 : 這裡是用來改清理資料的條件用的
-1. [filter](Filter/introduction/Filter.md) 過濾器 : 過濾資料並整理要用的東西。如果檔名和路徑有改這邊需要更新
+1. The [JSON configuration](Filter/introduction/json.md) defines the data-cleaning criteria.
+1. The [filter](Filter/introduction/Filter.md) cleans and organizes the data. Update it if file names or paths change.
 
-* [資料比較圖](Figures/data_comparison.md) : 點下去就可以看，用[data comparator](Filter/introduction/data_comparator.md)可以更新資料，想看什麼自行調整。(但因為數據不外流沒有開放圖形資料，執行後會自動更新)
-## 3. 線性回歸
-* [線性回歸](Fitter/introduction/linear_regression.md)可以幫助我們從一大堆資料點數據中找出輪胎的線性剛性
+* [Data comparison plots](Figures/data_comparison.md) can be regenerated with the [data comparator](Filter/introduction/data_comparator.md). Configure the plots as needed. Figures based on private data are generated locally when you run the script.
+## 3. Linear Regression
+* Use [linear regression](Fitter/introduction/linear_regression.md) to estimate linear tire stiffness from the measured data.
 
-## 後續方向
-1. 剛性擬和 : 其實真實輪胎其實不一定會是線性剛性，也許可以嘗試(指數、多項式等)並比較殘差。
-1. 更多分析 : 工具做好了其實可以用來把同個輪胎的更多找出鋼性關係
+## Further Work
+1. Real tire stiffness may be nonlinear. Try exponential or polynomial fits and compare residuals.
+1. Use the tool to analyze other stiffness relationships for the same tire.

@@ -2,37 +2,37 @@
 layout: base
 ---
 
-# CSV → TIR 轉換工具說明
-[檔案位置](../csv_to_tir.py)
+# CSV-to-TIR Conversion
+[Source file](../csv_to_tir.py)
 
-本模組負責將 **Magic Formula 擬合完成之 CSV 參數檔**
-轉換為可供車輛模型使用的 `.tir` 檔案。
+This module converts a **CSV parameter file from Magic Formula fitting**
+into a `.tir` file for use in a vehicle model.
 
-用途：
+The converter performs the following tasks.
 
-* 將擬合完成的 MF 參數
-* 自動寫回 TIR 模板
-* 產出最終可供模擬軟體使用的輪胎模型檔
-
----
-
-# 🎯 設計目的
-
-在完整擬合流程中：
-
-```
-擬合完成 → 更新 CSV → 轉換成 TIR → 模型使用
-```
-
-本腳本負責最後一步：
-
-> 將 `Fitting_process.csv` 的 x0 參數
-> 覆寫到 TIR 模板中
-> 產生最終輪胎模型檔
+* Read the fitted MF parameters.
+* Write the parameters into a TIR template.
+* Produce a tire model file for simulation software.
 
 ---
 
-# 📂 模組結構
+# 🎯 Purpose
+
+Where this step fits in the workflow
+
+```
+Complete fitting → Update the CSV → Convert to TIR → Use the tire model
+```
+
+This script handles the final conversion.
+
+> Take the `x0` parameters from `Fitting_process.csv`,
+> replace the corresponding values in the TIR template,
+> and generate the final tire model file.
+
+---
+
+# 📂 Module Structure
 
 ```
 magic_formula/
@@ -46,33 +46,33 @@ magic_formula/
 │   └── tir/
 │       └── tir_Fitting_results.tir
 │
-└── csv_to_tir.py  ← 本檔
+└── csv_to_tir.py  ← This script
 ```
 
 ---
 
-# 🔧 主要功能
+# 🔧 Main Functions
 
 ---
 
-## 1️⃣ 讀取 TIR 檔
+## 1️⃣ Reading a TIR File
 
 ```python
 load_tir(tir_path)
 ```
 
-功能：
+What it does
 
-* 讀取 `.tir` 檔案
-* 解析為：
+* Read the `.tir` file.
+* Parse the file into two forms.
 
-  * 原始文字列表
-  * 結構化字典
+  * A list of the original text lines.
+  * A structured dictionary.
 
-回傳格式：
+Return format
 
 ```python
-lines  # 原始文字 list
+lines  # List of original text lines
 tir_dict = {
   "SECTION": {
     "PARAM": value,
@@ -83,22 +83,22 @@ tir_dict = {
 
 ---
 
-### 解析邏輯說明
+### Parsing Rules
 
-* `[SECTION]` → 建立新的區段
-* `key = value` → 解析為參數
-* 忽略 `$` 開頭的註解
-* 嘗試轉為 float，失敗則保留字串
+* Start a section at `[SECTION]`.
+* Parse `key = value` as a parameter.
+* Ignore comments beginning with `$`.
+* Convert each value to a float when possible, otherwise keep it as a string.
 
-此功能可用於：
+Use the parser to do the following.
 
-* 參數檢查
+* Inspect the parameters.
 * Debug
-* 比對模板內容
+* Compare template contents.
 
 ---
 
-## 2️⃣ CSV 轉換為 TIR
+## 2️⃣ Converting CSV to TIR
 
 ```python
 csv_to_tir(csv_path, tir_path, tir_template)
@@ -106,28 +106,28 @@ csv_to_tir(csv_path, tir_path, tir_template)
 
 ---
 
-### 📌 輸入
+### 📌 Inputs
 
 * `csv_path`
-  擬合完成的 CSV 檔
+  is the CSV file containing the fitted parameters.
 
 * `tir_path`
-  輸出 TIR 路徑
+  is the output TIR path.
 
 * `tir_template`
-  TIR 模板檔
+  is the input TIR template file.
 
 ---
 
-### 📌 CSV 格式要求
+### 📌 CSV Format
 
-CSV 必須包含欄位：
+The CSV must contain these columns.
 
 ```
 name,x0
 ```
 
-範例：
+Examples
 
 ```
 PCX1,1.65
@@ -137,10 +137,10 @@ PKX1,22.5
 
 ---
 
-### 📌 轉換流程
+### 📌 Conversion Steps
 
-1. 讀取 CSV
-2. 建立參數 dict：
+1. Read the CSV.
+2. Build a parameter dictionary.
 
 ```python
 csv_params = {
@@ -149,47 +149,45 @@ csv_params = {
 }
 ```
 
-3. 逐行讀取 TIR 模板
-4. 若發現：
+3. Read the TIR template line by line.
+4. Look for a parameter assignment.
 
 ```
 KEY = value
 ```
 
-且 KEY 存在於 CSV：
-
-→ 替換成：
+If the CSV contains the key, replace its value.
 
 ```
 KEY = CSV_value
 ```
 
-5. 寫出新 TIR 檔
+5. Write the new TIR file.
 
 ---
 
-### 📌 範例替換輸出
+### 📌 Example Replacement Messages
 
 ```
-替換 PCX1 >>> 1.65
-替換 PDX1 >>> 1.12
+Replace PCX1 >>> 1.65
+Replace PDX1 >>> 1.12
 ```
 
 ---
 
-# 📄 TIR 模板需求
+# 📄 TIR Template Requirements
 
-模板必須：
+Template requirements
 
-* 使用標準 TIR 格式
-* 參數名稱與 CSV 完全一致
-* 使用：
+* Use the standard TIR format.
+* Match parameter names to the CSV exactly.
+* Use the following assignment format.
 
 ```
 PARAM = value
 ```
 
-# 🚀 執行流程
+# 🚀 Running the Converter
 
 ```python
 tir_lines, tir_data = load_tir(BASE_PATH/"data"/"TIR_template.tir")
@@ -205,22 +203,20 @@ csv_to_tir(
 )
 ```
 
-輸出：
+Output
 
 ```
-TIR 已生成: ...tir_Fitting_results.tir
+TIR generated: ...tir_Fitting_results.tir
 ```
 
-此模組為：
+This module completes the staged fitting workflow by exporting the fitted parameters.
 
-> 分段擬合系統的最終輸出端
-
-完整流程：
+Full workflow
 
 ```
-資料預處理
-→ 分段擬合
-→ 更新 CSV
+Data preprocessing
+→ Staged fitting
+→ Update the CSV
 → CSV → TIR
-→ 模型模擬
+→ Run the model in a simulation
 ```

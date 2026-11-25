@@ -2,16 +2,16 @@
 layout: base
 ---
 
-# 資料比較
-> 本檔案由python 自動更新，請不要進行md編輯。圖表會由[MF測試器輸出](../introduction/MF_tester.md)執行自動更新。
-## 摩擦圓
-### 正向力
+# Data Comparison
+> This page is generated automatically. Run the [Magic Formula tester](../introduction/MF_tester.md) to update the plots.
+## Friction Circle
+### Normal Load
 ![](Friction_Circle_vs_Fz_face.png)
 ![](Friction_Circle_vs_Fz_curves.png)
-### 滑移率
+### Slip Ratio
 ![](Friction_Circle_vs_Slip_Ratio_face.png)
 ![](Friction_Circle_vs_Slip_Ratio_curves.png)
-## 曲面圖
+## Surface Plots
 ### Fx
 ![](FX_Fzfix.png)
 ![](FX_alphafix.png)

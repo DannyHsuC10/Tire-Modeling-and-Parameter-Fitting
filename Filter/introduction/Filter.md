@@ -4,46 +4,46 @@ layout: base
 
 # Data Filter
 
-這個工具處要進行以下步驟 : 
+The filter processes data in four steps. 
 
-1. 頭尾清洗（Trim）
-2. 布林遮罩（Boolean Mask）
-3. 自動低通濾波（Auto Low-pass Filter）
-4. 資料轉換
+1. Trim the beginning and end of each series.
+2. Apply a Boolean mask.
+3. Apply an automatic low-pass filter.
+4. Convert the data.
 
-工具位於 : [這裡](../filter.py)
+[Filter source file](../filter.py)
 
-本工具會自動讀取 : [這個json檔案](json.md)
+The filter automatically reads [this JSON configuration](json.md).
 
 
-## 1. 頭尾清洗（Head / Tail Trimming）
+## 1. Trimming the Beginning and End
 
-### 目的
+### Purpose
 
-在量測資料（特別是輪胎試驗、動態量測）中，資料序列的**起始與結尾**常包含：
+The **beginning and end** of a measurement series, particularly in tire tests and other dynamic measurements, often contain
 
-* 系統尚未穩定的過渡狀態
-* 感測器尚未進入正常量測範圍
-* 減速、停止、或人為干擾
+* Transient conditions before the system stabilizes.
+* Readings from sensors outside their normal measurement range.
+* Deceleration, stops, or manual disturbances.
 
-這些資料通常不具物理代表性，因此在進入任何分析前必須先移除。
+Remove these samples before analysis because they do not represent the test conditions.
 
 ---
 
-### 數學描述
+### Mathematical Description
 
-假設原始資料為一個時間序列：
+Consider an original time series.
 
 $$
 \mathbf{X} = {x_1, x_2, \dots, x_N}
 $$
 
-定義：
+Definitions
 
-* $n_h$：要移除的開頭樣本數
-* $n_t$：要移除的結尾樣本數
+* $n_h$ is the number of samples to remove from the beginning.
+* $n_t$ is the number of samples to remove from the end.
 
-頭尾清洗後的資料定義為：
+Define the trimmed series as follows.
 
 $$
 \tilde{x}_i =
@@ -54,47 +54,47 @@ x_i, & \text{otherwise}
 \end{cases}
 $$
 
-此操作等價於：
+This operation does the following.
 
-* **保留資料長度不變**
-* 但明確標記「不可用區段」
+* **Keeps the length of the series unchanged.**
+* Marks the unusable regions explicitly.
 
-這樣的設計可確保後續遮罩與濾波在時間對齊上不會產生偏移。
-
----
-
-### 為何使用 NaN 而非直接刪除
-
-* NaN 可被視為「數學上不存在」
-* 可自然被遮罩、濾波、統計運算排除
-* 保留原始時間索引結構，避免錯位
+This preserves time alignment for subsequent masking and filtering.
 
 ---
 
-## 2. 布林遮罩（Boolean Mask）
+### Using NaN to Preserve the Time Index
 
-### 目的
-
-布林遮罩的核心思想是：
-
-> **在時間軸上標記哪些樣本「符合物理與實驗條件」**
-
-每一筆資料最終只會有兩種狀態：
-
-* `True`：可信、可用
-* `False`：剔除、不參與後續分析
+* NaN represents a missing value.
+* Masking, filtering, and statistical operations can exclude these values.
+* The original time index is preserved, preventing misalignment.
 
 ---
 
-### 2.1 基本範圍遮罩（Range Mask）
+## 2. Boolean Masking
 
-對於任一物理量 $x(t)$（例如 $F_z, \alpha, \kappa$），定義允許範圍：
+### Purpose
+
+The mask has the following purpose.
+
+> **Mark the samples that meet the physical and experimental conditions.**
+
+Each sample has one of two states.
+
+* `True` means the sample is valid and usable.
+* `False` means the sample is excluded from subsequent analysis.
+
+---
+
+### 2.1 Range Mask
+
+Define an allowed range for each physical quantity $x(t)$, such as $F_z, \alpha, \kappa$.
 
 $$
 x_{\min} \le x(t) \le x_{\max}
 $$
 
-其布林遮罩定義為：
+Define its Boolean mask as follows.
 
 $$
 m(t) = \begin{cases}
@@ -105,59 +105,59 @@ $$
 
 ---
 
-### 2.2 最小連續長度約束（Minimum Segment Length）
+### 2.2 Minimum Segment Length
 
-單點或極短區段即使落在合法範圍內，往往只是雜訊或瞬態。
+Isolated samples and very short segments may be noise or transients even if they lie within the allowed range.
 
-因此引入：
+Use the following constraint.
 
-* $L_{\min}$：最小連續有效長度
+* $L_{\min}$ is the minimum length of a continuous valid segment.
 
-對遮罩序列 $m(t)$，若某一連續 True 區段長度 $L$ 滿足：
+Given a mask sequence $m(t)$, consider a continuous True segment of length $L$ that meets the following condition.
 
 $$
 L < L_{\min}
 $$
 
-則該整段會被重新設為 False：
+Set the entire segment to False.
 
 $$
 m(t) = \text{False}, \quad \forall t \in \text{segment}
 $$
 
-此操作在數學上等價於：
+This is equivalent to
 
-* 一維布林訊號的「形態學去雜訊（opening-like operation）」
-
----
-
-### 2.3 斜率遮罩（Slope-based Mask）
-
-此遮罩用於處理如 slip ratio、slip angle 等「**應呈現線性趨勢**」的訊號。
+* a one-dimensional morphological noise removal operation similar to opening.
 
 ---
 
-#### (1) 區段定義
+### 2.3 Slope-Based Mask
 
-首先定義資料允許落入的正負範圍：
+Use this mask for signals such as slip ratio and slip angle that **should follow a linear trend**.
+
+---
+
+#### (1) Define Segments
+
+Set the allowed ranges for positive and negative values.
 
 $$
 x(t) \in [x^+*{\min}, x^+*{\max}] \cup [x^-*{\min}, x^-*{\max}]
 $$
 
-落在範圍外的資料點被視為「分段邊界」。
+Points outside the allowed ranges mark segment boundaries.
 
 ---
 
-#### (2) 區段斜率計算
+#### (2) Calculate the Segment Slope
 
-對每一個連續區段 ${x_1, \dots, x_n}$，以最小平方法擬合：
+Fit each continuous segment ${x_1, \dots, x_n}$ by least squares.
 
 $$
 x(t) \approx a t + b
 $$
 
-其中斜率 $a$ 為：
+The slope $a$ is
 
 $$
 a = \frac{\sum (t_i - \bar{t})(x_i - \bar{x})}{\sum (t_i - \bar{t})^2}
@@ -165,15 +165,15 @@ $$
 
 ---
 
-#### (3) 斜率條件
+#### (3) Apply the Slope Criterion
 
-若斜率滿足：
+If the slope satisfies the following condition,
 
 $$
 a_{\min} \le a \le a_{\max}
 $$
 
-則整個區段被視為有效：
+the whole segment is valid.
 
 $$
 m(t) = \text{True}
@@ -181,62 +181,62 @@ $$
 
 ---
 
-#### (4) 退化與例外處理
+#### (4) Handle Degenerate Cases and Exceptions
 
-* 若區段為常數（$\sigma_x < \varepsilon$）
+* If the segment is constant ($\sigma_x < \varepsilon$),
 
-  * 視為穩態資料，**直接通過**
-* 若包含 NaN / Inf
+  * treat it as steady-state data and **keep it**.
+* If it contains NaN or Inf,
 
-  * 區段捨棄
+  * discard the segment.
 
 ---
 
-### 2.4 多遮罩合成邏輯
+### 2.4 Combining Masks
 
-* **同一欄位內多條件**：
+* **Multiple conditions on the same column**
 
 $$
 m_{\text{col}} = m_1 \lor m_2 \lor \dots
 $$
 
-* **不同欄位之間**：
+* **Conditions across different columns**
 
 $$
 m_{\text{total}} = \bigwedge_k m_k
 $$
 
-最終遮罩 $m_{\text{total}}$ 決定資料是否保留。
+The final mask $m_{\text{total}}$ determines which samples to keep.
 
-## 3. 布林遮罩的集合論數學詮釋
+## 3. Set-Theoretic Interpretation of Boolean Masks
 
-### 時間索引集合與資料映射
+### Time Index Set and Data Mapping
 
-令離散量測時間索引集合為：
+Define the discrete set of measurement time indices.
 
 $$
 \mathcal{T} = \{ t_1, t_2, \dots, t_N \}
 $$
 
-對於任一量測物理量（如 $F_z, \alpha, \kappa, SL$），其資料可視為一個映射：
+Treat each measured quantity, such as $F_z, \alpha, \kappa, SL$, as a mapping.
 
 $$
 x : \mathcal{T} \rightarrow \mathbb{R}
 $$
 
-布林遮罩的核心目的，是在時間集合 $\mathcal{T}$ 上定義一個**物理上可接受的子集合**。
+A Boolean mask defines a **physically acceptable subset** of the time index set $\mathcal{T}$.
 
 ---
 
-### 單一條件對應的子集合
+### Subset for a Single Condition
 
-給定一組範圍限制：
+Given a range constraint,
 
 $$
 x_{\min} \le x(t) \le x_{\max}
 $$
 
-可定義其對應的時間子集合為：
+define the corresponding subset of time indices.
 
 $$
 \mathcal{A}
@@ -244,7 +244,7 @@ $$
 \{\, t \in \mathcal{T} \mid x_{\min} \le x(t) \le x_{\max} \,\}
 $$
 
-布林遮罩即為該集合的指示函數（indicator function）：
+The Boolean mask is the indicator function of that set.
 
 $$
 m(t) = \mathbf{1}_{\mathcal{A}}(t)
@@ -257,9 +257,9 @@ $$
 
 ---
 
-### 同一欄位多條件：聯集（OR）
+### Combining Conditions on One Column with Union (OR)
 
-若同一物理量允許多組操作條件，其可接受集合定義為聯集：
+If one physical quantity allows several operating conditions, take the union of their acceptable sets.
 
 $$
 \mathcal{A}_{\text{col}}
@@ -267,7 +267,7 @@ $$
 \bigcup_{i=1}^{k} \mathcal{A}_i
 $$
 
-對應的布林運算為：
+The corresponding Boolean operation is
 
 $$
 m_{\text{col}}(t)
@@ -275,15 +275,15 @@ m_{\text{col}}(t)
 \bigvee_{i=1}^{k} m_i(t)
 $$
 
-其物理意義為：
+which has the following interpretation.
 
-> 只要資料點屬於任一合理操作狀態，即視為有效。
+> A sample is valid if it belongs to any acceptable operating condition.
 
 ---
 
-### 不同物理量之間：交集（AND）
+### Combining Different Physical Quantities with Intersection (AND)
 
-對多個物理量同時施加限制時，其最終可接受時間集合為：
+When constraints apply to several physical quantities, intersect their acceptable time sets.
 
 $$
 \mathcal{A}_{\text{total}}
@@ -291,7 +291,7 @@ $$
 \bigcap_{j} \mathcal{A}_j
 $$
 
-布林表示為：
+In Boolean form,
 
 $$
 m_{\text{total}}(t)
@@ -299,13 +299,13 @@ m_{\text{total}}(t)
 \bigwedge_{j} m_j(t)
 $$
 
-代表該時間點**同時滿足所有物理與實驗條件**。
+a time index must **meet every physical and experimental condition**.
 
 ---
 
-### 最小連續長度的集合意義
+### Set Interpretation of Minimum Segment Length
 
-設 $\mathcal{A}$ 中的一段連續時間子集合為：
+Take a continuous time subset of $\mathcal{A}$.
 
 $$
 \mathcal{S}_i
@@ -313,27 +313,27 @@ $$
 \{ t_k, t_{k+1}, \dots, t_{k+L_i} \}
 $$
 
-若其長度滿足：
+If its length meets the following condition,
 
 $$
 |\mathcal{S}_i| < L_{\min}
 $$
 
-則該集合會被移除：
+remove that subset.
 
 $$
 \mathcal{A} \leftarrow \mathcal{A} \setminus \mathcal{S}_i
 $$
 
-此步驟可視為在時間集合上的**結構性濾波**，排除不具物理穩定意義的短暫事件。
+This filters out short events that do not represent a stable physical condition.
 
 ---
 
-## 4. 傅立葉自動低通濾波器的
+## 4. Automatic Fourier-Based Low-Pass Filtering
 
-### 4.1 時域與頻域的傅立葉對偶
+### 4.1 Fourier Duality Between Time and Frequency
 
-對離散時間訊號 $x(t)$，其頻域表示為：
+The frequency-domain representation of the discrete signal $x(t)$ is given below.
 
 $$
 X(f)
@@ -342,25 +342,25 @@ X(f)
 x(t)\,e^{-j2\pi f t}
 $$
 
-其中高頻成分通常對應於量測雜訊、結構振動或非物理快速變化。
+High-frequency components often represent measurement noise, structural vibration, or rapid artifacts.
 
 ---
 
-### 4.2 功率頻譜密度與 Welch 方法
+### 4.2 Power Spectral Density and Welch's Method
 
-功率頻譜密度（PSD）定義為：
+Define the power spectral density (PSD) as follows.
 
 $$
 P(f) = |X(f)|^2
 $$
 
-Welch 方法透過分段、加窗與平均，得到穩定的能量分佈估計。
+Welch's method segments, windows, and averages the signal to estimate the energy distribution reliably.
 
 ---
 
-### 4.3 累積能量與截止頻率選擇
+### 4.3 Cumulative Energy and Cutoff Selection
 
-定義累積能量函數為：
+Define the cumulative energy function.
 
 $$
 E(f)
@@ -368,7 +368,7 @@ E(f)
 \int_{0}^{f} P(\nu)\,d\nu
 $$
 
-選擇截止頻率 $f_c$ 使其滿足：
+Choose cutoff frequency $f_c$ to satisfy the following condition.
 
 $$
 E(f_c)
@@ -376,15 +376,15 @@ E(f_c)
 r \cdot E(f_{\text{Nyq}})
 $$
 
-其中 $r$ 為能量保留比例。此條件代表：
+Here, $r$ is the fraction of energy to retain.
 
-> 頻率區間 $[0, f_c]$ 已包含大部分具物理意義的訊號能量。
+> The frequency range $[0, f_c]$ contains most of the physically meaningful signal energy.
 
 ---
 
-### 4.4 Butterworth 低通濾波器
+### 4.4 Butterworth Low-Pass Filter
 
-$n$ 階 Butterworth 低通濾波器的幅值響應為：
+An order-$n$ Butterworth low-pass filter has the following magnitude response.
 
 $$
 |H(\omega)|^2
@@ -392,33 +392,33 @@ $$
 \frac{1}{1 + (\omega / \omega_c)^{2n}}
 $$
 
-其特性為通帶內最大平坦，避免引入非物理振盪。
+Its maximally flat passband avoids introducing artificial oscillations.
 
 ---
 
-### 4.5 零相位濾波的數學意義
+### 4.5 Zero-Phase Filtering
 
-使用前向–反向濾波（`filtfilt`）等價於：
+Forward-backward filtering (`filtfilt`) is equivalent to the following.
 
 $$
 y(t) = H(z)\,H(z^{-1})\,x(t)
 $$
 
-可完全抵銷相位延遲，使濾波後訊號與原始時間軸對齊。
+It cancels phase delay so the filtered signal stays aligned with the original time axis.
 
 ---
 
-### 4.6 數值穩定性限制
+### 4.6 Numerical Stability Constraints
 
-- 常數訊號：$P(f)=0,\ \forall f>0$，不進行濾波  
-- $f_c > 0$：避免退化為純 DC 濾波  
-- $f_c < 0.45 f_s$：確保數位濾波器穩定性
+- Skip filtering constant signals for which $P(f)=0,\ \forall f>0$.  
+- $f_c > 0$ avoids reducing the filter to DC only.  
+- $f_c < 0.45 f_s$ keeps the digital filter within its stability limit.
 
-## 5. 資料轉換
-資料轉換步驟主要分成以轉換與清除
+## 5. Data Conversion
+This step converts the remaining data and removes unused fields.
 
-1. 轉換 : 進行單位換算與坐標系上的正負調換
-1. 清除 : 去除目前用不到的資料，這部分未來如果可以改進程定義一個json，然後去讀取直接進行資料修改會比較理想，可以進一步降低未來需要改寫程式碼的機率。
+1. Convert units and adjust signs to match the target coordinate convention.
+1. Remove unused fields. Moving these field rules into JSON would reduce future source edits.
 
-6. 改進方向
-多斜率or邏輯加入 : 假設使用其他的TTC資料可以之後會碰到多種斜率問題，這個部分可以進行改善，用與範圍遮罩相同的手法加入通用多段斜率和斜率變化率。感善後可以大幅提升通用性，理論上只需要改 class 中的build_slope_mask和build_masks即可。把build_masks加入可以讀更多的 json 結構，然後裡面加入or邏輯改善。
+6. Planned Improvements
+Add OR logic for multiple slope conditions. Other TTC datasets may contain segments with different slopes. Extend `build_slope_mask` and `build_masks` to process multiple slope and slope-change conditions and read their definitions from JSON, following the range mask approach.

@@ -31,7 +31,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#content">跳至主要內容</a>
+  <a class="skip-link" href="#content">Skip to main content</a>
   <header class="site-header">
     <div class="site-container header-inner">
       <a class="brand" href="{{ '/' | relative_url }}">
@@ -41,8 +41,8 @@
           <span class="brand-title">Tire Modeling</span>
         </span>
       </a>
-      <nav class="site-nav" aria-label="專案導覽">
-        <a class="button" href="{{ platform_tools }}">返回工具庫</a>
+      <nav class="site-nav" aria-label="Project navigation">
+        <a class="button" href="{{ platform_tools }}">Back to Tool Library</a>
         <a class="button button-primary" href="{{ repository }}">GitHub</a>
       </nav>
     </div>
@@ -52,25 +52,25 @@
     {% if is_home %}
       <header class="project-intro" aria-labelledby="tire-modeling-and-parameter-fitting">
         <h1 id="tire-modeling-and-parameter-fitting" lang="en">{{ project_title | escape }}</h1>
-        <p>使用 Python 或 MATLAB 建立 Magic Formula 輪胎模型，從量測資料擬合參數、輸出 TIR 檔並驗證模型。</p>
+        <p>Build Magic Formula tire models in Python or MATLAB, fit parameters to measured data, export TIR files, and validate model predictions.</p>
       </header>
 
-      <nav class="docs-shortcuts" aria-label="常用文件">
+      <nav class="docs-shortcuts" aria-label="Quick links to documentation">
         <a class="shortcut" href="{{ model_url | relative_url }}">
-          <span class="shortcut-title">輪胎模型</span>
-          <span class="shortcut-description">查閱 Python 版 Magic Formula 模型。</span>
+          <span class="shortcut-title">Tire Modeling</span>
+          <span class="shortcut-description">Explore the Python implementation of Magic Formula.</span>
         </a>
         <a class="shortcut" href="{{ fitting_url | relative_url }}">
-          <span class="shortcut-title">參數擬合</span>
-          <span class="shortcut-description">從資料預處理到分段擬合與 TIR 輸出。</span>
+          <span class="shortcut-title">Parameter Fitting</span>
+          <span class="shortcut-description">Prepare data, fit parameters in stages, and export a TIR file.</span>
         </a>
         <a class="shortcut" href="{{ testing_url | relative_url }}">
-          <span class="shortcut-title">模型驗證</span>
-          <span class="shortcut-description">比較 TIR 模型輸出與實驗量測資料。</span>
+          <span class="shortcut-title">Model Validation</span>
+          <span class="shortcut-description">Compare tire model predictions with measured data.</span>
         </a>
       </nav>
     {% else %}
-      <a class="docs-home" href="{{ '/' | relative_url }}">文件首頁</a>
+      <a class="docs-home" href="{{ '/' | relative_url }}">Documentation Home</a>
     {% endif %}
 
     <article class="markdown-body">
@@ -81,7 +81,7 @@
   <footer class="site-footer">
     <div class="site-container footer-inner">
       <span>FSAE Design Platform</span>
-      <a href="{{ '/' | relative_url }}">輪胎模型文件</a>
+      <a href="{{ '/' | relative_url }}">Tire Modeling Documentation</a>
     </div>
   </footer>
 </body>

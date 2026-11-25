@@ -1,51 +1,51 @@
-# 批次轉換 `.mat` 檔案為 Excel 與 CSV
-檔案位置>>[link](../data/mat_to_csv_excel.m)
-## 功能概述
-這份 MATLAB 腳本的主要目的，是 **自動化批次處理資料夾中的 `.mat` 檔案**，並將其中的變數轉換成 **Excel (`.xlsx`) 與 CSV (`.csv`) 格式**，以便後續資料分析與處理。
+# Batch Conversion of `.mat` Files to Excel and CSV
+[MATLAB source file](../data/mat_to_csv_excel.m)
+## Overview
+This MATLAB script **batch-processes `.mat` files** in a directory and converts their variables to **Excel (`.xlsx`) and CSV (`.csv`)** for further analysis.
 
 ---
 
-## 程式流程
+## Workflow
 
-1. **初始化與路徑設定**
-   - 取得腳本所在資料夾路徑。
-   - 定義輸入資料夾 `mat`，輸出資料夾 `csv` 與 `excel`。
-   - 若輸出資料夾不存在，則自動建立。
+1. **Initialize and set paths.**
+   - Find the directory containing the script.
+   - Set `mat` as the input directory and `csv` and `excel` as the output directories.
+   - Create the output directories if they do not exist.
 
-2. **讀取 `.mat` 檔案**
-   - 使用 `dir` 搜尋 `mat` 資料夾中的所有 `.mat` 檔案。
-   - 若未找到任何檔案，則拋出錯誤。
+2. **Read `.mat` files.**
+   - Use `dir` to find all `.mat` files in the `mat` directory.
+   - Raise an error if the directory contains no matching files.
 
-3. **主迴圈處理**
-   - 逐一讀取每個 `.mat` 檔案。
-   - 將檔案中的變數載入並轉換成 `table` 格式。
-   - 嘗試合併所有變數成一個完整表格：
-     - 若列數不一致，則跳過該變數。
-     - 若欄位名稱重複，則自動生成唯一名稱。
+3. **Process the files.**
+   - Read each `.mat` file in turn.
+   - Load its variables and convert them to MATLAB tables.
+   - Try to combine the variables into a single table.
+     - Skip variables with a different number of rows.
+     - Generate unique names for duplicate columns.
 
-4. **輸出結果**
-   - 將合併後的表格輸出為：
-     - `.csv` 檔案 → 存放於 `csv` 資料夾。
-     - `.xlsx` 檔案 → 存放於 `excel` 資料夾。
+4. **Write the results.**
+   - Export the combined table in two formats.
+     - Save `.csv` files in `csv`.
+     - Save `.xlsx` files in `excel`.
 
-5. **工具函式 `convertToTable`**
-   - 將不同型態的變數轉換成 `table`：
-     - `table` → 直接使用。
-     - `numeric` → 轉換為欄位或向量。
-     - `struct` → 使用 `struct2table`。
-     - `cell` → 使用 `cell2table`。
-     - 其他型態 → 拋出錯誤。
-
----
-
-## 使用場景
-- `.mat` 檔案通常用於儲存 MATLAB 計算結果或實驗數據，但不易在其他工具中直接使用。  
-- 轉換成 `.csv` 或 `.xlsx` 格式後，可以方便地在 **Excel、Python、R** 等工具中進行後續分析。  
-- 此腳本適合用於 **批次資料清理、跨平台資料共享、數據前處理**。
+5. **Convert values with `convertToTable`.**
+   - Convert supported MATLAB types to `table`.
+     - Use an existing `table` directly.
+     - Convert `numeric` values to columns or vectors.
+     - Convert a `struct` with `struct2table`.
+     - Convert a `cell` with `cell2table`.
+     - Raise an error for other types.
 
 ---
 
-## 範例使用方式
-1. 將所有 `.mat` 檔案放入 `mat` 資料夾。  
-2. 按run執行此腳本。  
-3. 在 `csv` 與 `excel` 資料夾中取得轉換後的檔案。  
+## Use Cases
+- MATLAB often stores calculations and experimental data in `.mat` files, which other tools may have difficulty reading directly.  
+- Convert to `.csv` or `.xlsx` for further analysis in **Excel, Python, or R**.  
+- Use this script for **batch data cleaning, cross-platform sharing, and preprocessing**.
+
+---
+
+## Example Usage
+1. Place all `.mat` files in the `mat` directory.  
+2. Run the script from MATLAB.  
+3. Find the converted files in the `csv` and `excel` directories.  

@@ -2,13 +2,13 @@
 layout: base
 ---
 
-# Magic Formula 模型計算說明 (滾動阻力矩 $RRT$)
-模型位置>> [RRT](../RRT_models.py)
+# Magic Formula Calculations for Rolling Resistance Moment $RRT$
+[RRT source file](../RRT_models.py)
 
-預先計算輸入力量 : [Fx](Fx_model.md)
-## MF 模型
+Calculate the required input force first using [Fx](Fx_model.md).
+## Magic Formula Model
 
-- **滾動阻力係數 $f_{rr}$**  
+- **Rolling resistance coefficient $f_{rr}$**  
   $$
   f_{rr} = QSY1
   + QSY2 \cdot \frac{F_x}{F_{z0}' + \epsilon}
@@ -17,33 +17,33 @@ layout: base
   + QSY5 \cdot \gamma^2
   + QSY6 \cdot \gamma^2 \cdot \frac{F_z}{F_{z0}' + \epsilon}
   $$
-  **物理意義**：滾動阻力係數，綜合考慮縱向力、車速、傾角與載荷的影響。它描述了輪胎在滾動過程中因變形與摩擦而產生的能量損耗。
+  **Physical meaning.** Represents energy lost to tire deformation and friction during rolling, accounting for longitudinal force, speed, camber, and load.
 
-- **修正項**  
+- **Correction terms**  
   $$f_{rr} \leftarrow f_{rr} \cdot (1 + QSY7 \cdot dfz + QSY8 \cdot dpi)$$
-  **物理意義**：修正滾動阻力係數，考慮載荷變化 ($dfz$) 與胎壓偏差 ($dpi$) 的影響。
+  **Physical meaning.** Adjust the rolling resistance coefficient for changes in load ($dfz$) and inflation pressure ($dpi$).
 
-- **滾動阻力矩**  
+- **Rolling resistance moment**  
   $$PPT = -R_o \cdot F_z \cdot f_{rr}$$
-  **物理意義**：最終的滾動阻力矩，與接地半徑 $R_o$、法向力 $F_z$ 以及滾動阻力係數成正比。負號表示阻力方向與車輛前進方向相反。
+  **Physical meaning.** The moment is proportional to tire radius $R_o$, normal load $F_z$, and the rolling resistance coefficient. The negative sign indicates opposition to forward motion.
 
 ---
 
-## SAE 模型
+## SAE Model
 
-- **各項計算**  
+- **Individual terms**  
   $$R1 = \frac{K'}{c1}, \quad R2 = c2$$
   $$R3 = \frac{c3 + c4 \cdot F_z}{p}, \quad R4 = \frac{c5 + c6 \cdot F_z}{p} \cdot v^2$$
-  **物理意義**：這些項目分別代表不同的滾動阻力來源：  
-  - $R1$：基準比例因子  
-  - $R2$：常數項  
-  - $R3$：與載荷及胎壓相關的阻力  
-  - $R4$：與速度平方相關的阻力（波動與滾動波動的耦合效應）
+  **Physical meaning.** The terms represent different contributions to rolling resistance.  
+  - $R1$ is the baseline scale factor.  
+  - $R2$ is the constant term.  
+  - $R3$ accounts for load and inflation pressure.  
+  - $R4$ accounts for the speed-squared contribution, including interaction with rolling fluctuations.
 
-- **滾動阻力係數**  
+- **Rolling resistance coefficient**  
   $$C_{rr} = R1 \cdot (R2 + R3 + R4)$$
-  **物理意義**：綜合各項影響後的滾動阻力係數。
+  **Physical meaning.** Combines the contributions to rolling resistance.
 
-- **滾動阻力**  
+- **Rolling resistance**  
   $$F_r = C_{rr} \cdot F_z$$
-  **物理意義**：最終的滾動阻力，與法向力成正比，反映輪胎在滾動過程中消耗的能量。
+  **Physical meaning.** The resulting force is proportional to normal load and represents energy consumed as the tire rolls.

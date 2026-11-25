@@ -1,9 +1,9 @@
-# Data Comparator 使用說明
+# Data Comparator User Guide
 
-## 專案位置
+## Source Location
 
-此程式位於 [此處](../Data_comparator.py)，
-主要用途為**比較原始輪胎測試資料與經過前處理後資料的差異**。
+See the [source file](../Data_comparator.py).
+The tool **compares raw tire test data with preprocessed data**.
 
 ```
 magic_formula/
@@ -11,37 +11,37 @@ magic_formula/
 │  └─ Data_comparator.py
 ├─ data/
 │  └─ csv/
-│     ├─ 原始資料.csv
+│     ├─ raw_data.csv
 ├─ data/
 │  └─ Filtered_data/
-│     ├─ 資料_processed.csv
+│     ├─ data_processed.csv
 ```
 
 ---
 
-## 功能說明
+## Features
 
-`DataComparator` 類別用於：
+The `DataComparator` class does the following.
 
-* 讀取原始 CSV 資料
-* 讀取清洗 / 過濾後 CSV 資料
-* 自動尋找 **共同欄位**
-* 將相同欄位的資料：
+* Read the raw CSV.
+* Read the cleaned or filtered CSV.
+* Identify **columns shared by both files**.
+* Plot the data for each shared column in two panels.
 
-  * 左圖 → 原始資料
-  * 右圖 → 清洗後資料
-* 支援：
+  * Left panel for raw data.
+  * Right panel for cleaned data.
+* Choose one of the following output modes.
 
-  * 即時顯示圖形
-  * 或儲存比較圖
+  * Show the plots immediately.
+  * Save the comparison plots.
 
 ---
 
-## 類別說明
+## Class Reference
 
 ### `DataComparator`
 
-### 初始化參數
+### Constructor Parameters
 
 ```python
 DataComparator(
@@ -52,41 +52,41 @@ DataComparator(
 )
 ```
 
-| 參數                 | 說明                                |
+| Parameter | Description |
 | ------------------ | --------------------------------- |
-| `raw_filename`     | 原始資料檔名（位於 `data/csv/`）            |
-| `cleaned_filename` | 清洗後資料檔名（位於 `data/Filtered_data/`） |
-| `save_fig`         | 是否儲存圖片（預設 False → 顯示圖形）           |
-| `fig_dir`          | 儲存圖片資料夾名稱                         |
+| `raw_filename` | Raw data file name in `data/csv/` |
+| `cleaned_filename` | Cleaned data file name in `data/Filtered_data/` |
+| `save_fig` | Save plots if enabled. The default, False, displays them. |
+| `fig_dir` | Directory name for saved plots |
 
 ---
 
-## 比較邏輯
+## Comparison Logic
 
-1. 讀取兩個 CSV
-2. 取得兩者的交集欄位
-3. 對每一個共同欄位：
+1. Read the two CSV files.
+2. Identify the shared columns.
+3. For each shared column, create a comparison figure.
 
-   * 建立 1x2 子圖
-   * 左圖：Raw data
-   * 右圖：Cleaned data
-4. 根據 `save_fig`：
+   * Create a 1×2 subplot layout.
+   * Left panel holds the raw data.
+   * Right panel holds the cleaned data.
+4. Apply the `save_fig` setting.
 
-   * `False` → 顯示圖形
-   * `True` → 儲存為 PNG
+   * `False` displays the plot.
+   * `True` saves the plot as a PNG.
 
 ---
 
-##  使用方式
+## Usage
 
-直接執行：
+Run the following example directly.
 
 ```python
 if __name__ == "__main__":
 
     comparator = DataComparator(
-        raw_filename="資料名稱.csv",
-        cleaned_filename="資料名稱_processed1.csv",
+        raw_filename="data_name.csv",
+        cleaned_filename="data_name_processed1.csv",
         save_fig=False
     )
     comparator.compare_columns()
@@ -94,49 +94,49 @@ if __name__ == "__main__":
 
 ---
 
-## 輸出效果
+## Output
 
-每個欄位會產生一張比較圖，可用於觀察(Y 軸共用)：
+The tool creates one side-by-side plot per column with a shared y-axis. Use the plots to check the following.
 
-* 濾波效果
-* 離群值是否被移除
-* 訊號是否平滑化
-* 是否誤刪資料
-
----
-
-## 適用情境
-
-* Magic Formula 輪胎模型前處理驗證
-* 濾波器效果檢查
-* Boolean mask 清洗檢查
-* 單位轉換驗證
-* 數據品質檢查
+* The effect of filtering.
+* Whether outliers were removed.
+* Whether the signal was smoothed.
+* Whether valid data was removed by mistake.
 
 ---
 
-## 📁 圖片儲存模式
+## Use Cases
 
-若設定：
+* Validate preprocessing for the Magic Formula tire model.
+* Inspect the effects of filtering.
+* Check Boolean mask cleaning.
+* Verify unit conversions.
+* Check data quality.
+
+---
+
+## 📁 Saving Plots
+
+With the following setting,
 
 ```python
 save_fig=True
 ```
 
-將自動建立：
+the tool creates this directory
 
 ```
 magic_formula/figures/
 ```
 
-並儲存：
+and saves the plots here.
 
 ```
 ColumnName_comparison.png
 ```
 
-## 注意事項
+## Notes
 
-* 兩份 CSV 必須存在於指定資料夾
-* 若欄位名稱不同則不會被比較
-* 資料筆數不同時仍可畫圖（以 index 為 X 軸）
+* Both CSV files must exist in their expected directories.
+* The tool compares columns with matching names.
+* The two files can contain different numbers of samples. The sample index is used on the x-axis.

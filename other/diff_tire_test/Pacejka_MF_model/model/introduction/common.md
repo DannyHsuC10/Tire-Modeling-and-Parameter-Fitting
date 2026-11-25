@@ -1,39 +1,39 @@
-# Magic Formula 基類
-模型位置>> [common](../_common.py)
-## 歸一化法向力 `_normalize_load`
+# Magic Formula Base Class
+[Base class source file](../_common.py)
+## Normalizing Normal Load with `_normalize_load`
 
-- **公式**  
+- **Equation**  
   $$F_{z0}' = LFZO \cdot FNOMIN$$
   $$dfz = \frac{F_z - F_{z0}'}{F_{z0}' + \epsilon}$$
 
-- **物理意義**  
-  - $F_{z0}'$：基準法向力，通常取名義載荷 (Nominal Load)，作為比較基準。  
-  - $dfz$：載荷偏差，描述實際法向力相對於基準載荷的偏移量。這能讓模型在不同載荷下保持一致性。
+- **Physical meaning**  
+  - $F_{z0}'$ is the reference normal force, typically the nominal load.  
+  - $dfz$ is the deviation of the actual normal load relative to the reference load. Normalization keeps the model consistent across load conditions.
 
 ---
 
-## 歸一化胎壓 `_normalize_pressure`
+## Normalizing Inflation Pressure with `_normalize_pressure`
 
-- **公式**  
+- **Equation**  
   $$dpi = \frac{p - PIO}{PIO}$$
   $$dpi^2 = dpi^2$$
 
-- **物理意義**  
-  - $dpi$：胎壓偏差，描述實際胎壓相對於基準胎壓 $PIO$ 的變化比例。  
-  - $dpi^2$：平方項，用來捕捉胎壓偏差的非線性影響。這能反映胎壓對剛性與摩擦的二次效應。
+- **Physical meaning**  
+  - $dpi$ is the fractional deviation of inflation pressure from the reference pressure $PIO$.  
+  - $dpi^2$ captures second-order effects of pressure variation on stiffness and friction.
 
 ---
 
-## 歸一化角度 `_normalize_angles`
+## Normalizing Angles with `_normalize_angles`
 
-- **公式**  
+- **Equation**  
   $$SA_{rad} = \text{radians}(SA)$$
   $$IA_{rad} = \text{radians}(IA)$$
   $$a_{mi} = \tan(SA_{rad})$$
   $$ia_{Mi} = \sin(IA_{rad})$$
   $$ia_{Mi}^2 = (\sin(IA_{rad}))^2$$
 
-- **物理意義**  
-  - $a_{mi}$：側偏角的正切值，用來描述滑移角對橫向力的影響。  
-  - $ia_{Mi}$：傾角 (camber) 的正弦值，反映輪胎傾斜對力矩與橫向力的影響。  
-  - $ia_{Mi}^2$：平方項，用來捕捉 camber 的非線性效應。  
+- **Physical meaning**  
+  - $a_{mi}$ is the tangent of the slip angle and captures its effect on lateral force.  
+  - $ia_{Mi}$ is the sine of the camber angle and captures the effect of tire inclination on moments and lateral force.  
+  - $ia_{Mi}^2$ captures nonlinear camber effects.  

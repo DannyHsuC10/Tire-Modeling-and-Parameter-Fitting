@@ -3,27 +3,27 @@ layout: base
 ---
 
 # MF_fitter 
-[檔案位置](../MF_fitter.py)
-## 1. 擬合概念說明
-MF_fitter 的核心是利用 **非線性最小平方法 (Nonlinear Least Squares)** 來進行參數擬合。其基本思想是最小化「模型預測值」與「實際量測值」之間的殘差平方和。
+[Fitter source file](../MF_fitter.py)
+## 1. Fitting Concept
+MF_fitter uses **nonlinear least squares** to fit parameters. It minimizes the sum of squared residuals between model predictions and measured values.
 
 $$
 \min_{\mathbf{x}} \; \sum_{i=1}^{n} \left( F_{\text{pred},i}(\mathbf{x}) - F_{\text{meas},i} \right)^2
 $$
 
-其中：
-- $F_{\text{pred},i}(\mathbf{x})$：模型在第 $i$ 個輸入下的預測值  
-- $F_{\text{meas},i}$：量測值  
-- $\mathbf{x}$：待擬合的參數向量  
+The terms are defined below.
+- $F_{\text{pred},i}(\mathbf{x})$ is the model prediction for the $i$th input.  
+- $F_{\text{meas},i}$ is the measured value.  
+- $\mathbf{x}$ is the parameter vector to fit.  
 
-## 2. 殘差函數 (Residual Function)
-殘差函數定義為：
+## 2. Residual Function
+Define the residual function as follows.
 
 $$
 r_i(\mathbf{x}) = F_{\text{pred},i}(\mathbf{x}) - F_{\text{meas},i}
 $$
 
-整體殘差向量為：
+The residual vector is
 
 $$
 \mathbf{r}(\mathbf{x}) = 
@@ -35,56 +35,56 @@ r_n(\mathbf{x})
 \end{bmatrix}
 $$
 
-最小化問題即轉化為：
+and the minimization problem becomes
 
 $$
 \min_{\mathbf{x}} \; \|\mathbf{r}(\mathbf{x})\|^2
 $$
 
-## 3. 參數打包與解包
-在擬合過程中，僅部分參數會被優化。  
-- **打包 (pack)**：將 $active\_keys$ 對應的參數組合成向量 $\mathbf{x}$，並設定上下限 $lb, ub$。  
-- **解包 (unpack)**：將優化後的 $\mathbf{x}$ 更新回完整的 $stage\_params$ 字典。
+## 3. Packing and Unpacking Parameters
+The optimizer updates only the parameters active in the current stage.  
+- **Pack.** Combine the parameters selected by $active\_keys$ into vector $\mathbf{x}$ and set its lower and upper bounds $lb, ub$.  
+- **Unpack.** Write the optimized values in $\mathbf{x}$ back into the full $stage\_params$ dictionary.
 
-## 4. 邊界條件 (Bounds)
-為了避免不合理的解，優化器會設定參數的上下限：
+## 4. Parameter Bounds
+The optimizer uses lower and upper parameter bounds to keep solutions within valid ranges.
 
 $$
 lb_j \leq x_j \leq ub_j
 $$
 
-其中：
-- $lb_j$：第 $j$ 個參數的下限  
-- $ub_j$：第 $j$ 個參數的上限  
+The terms are defined below.
+- $lb_j$ is the lower bound for the $j$th parameter.  
+- $ub_j$ is the upper bound for the $j$th parameter.  
 
-## 5. 使用的優化方法
-MF_fitter 採用 **scipy.optimize.least_squares**，其主要特點包括：
-- 方法：Trust Region Reflective (TRF)  
-- 損失函數：Soft L1 損失，降低異常值影響  
+## 5. Optimization Method
+MF_fitter uses **scipy.optimize.least_squares** with the following settings.
+- Trust Region Reflective (TRF) method.  
+- Soft L1 loss to reduce the influence of outliers.  
 
 $$
 \text{loss}(r) = 2 \left( \sqrt{1 + \frac{r^2}{2}} - 1 \right)
 $$
 
-此損失函數在 $r$ 很大時近似於線性，能減少離群值對結果的影響。
+For large $r$, this loss grows approximately linearly, reducing the influence of outliers.
 
-## 6. 模型輸入與輸出
-模型輸入包含：
-- $FZ$：垂直載荷  
-- $SA$：舵角 (Slip Angle)  
-- $SL$：滑移率 (Slip Ratio)  
-- $IA$：外傾角 (Inclination Angle)  
-- $pressure$：胎壓  
-- $Ro$：輪胎半徑  
-- $V$：速度  
+## 6. Model Inputs and Outputs
+The model takes the following inputs.
+- $FZ$ is the vertical load.  
+- $SA$ is the slip angle.  
+- $SL$ is the slip ratio.  
+- $IA$ is the inclination angle, or camber.  
+- $pressure$ is the tire inflation pressure.  
+- $Ro$ is the tire radius.  
+- $V$ is the speed.  
 
-模型輸出依據選擇的 $out$ 類型 (Fx, Fy, Mx, Mz, RRT)，對應不同的力或力矩。
+The selected $out$ value (Fx, Fy, Mx, Mz, or RRT) determines which force or moment the model returns.
 
-## 7. 擬合流程總結
-1. **初始化**：設定待擬合參數及上下限  
-2. **打包**：將參數轉換為向量形式  
-3. **殘差計算**：比較模型預測與量測值  
-4. **優化**：利用最小平方法更新參數  
-5. **解包**：將最佳解更新回完整參數字典  
+## 7. Fitting Workflow
+1. **Initialize.** Choose the parameters to fit and set their bounds.  
+2. **Pack.** Assemble the parameters into a vector.  
+3. **Calculate residuals.** Compare model predictions with measured values.  
+4. **Optimize.** Update parameters using least squares.  
+5. **Unpack.** Write the best solution back into the full parameter dictionary.  
 
-最終得到的參數組合能使模型在給定輸入下，與量測數據的誤差最小化。
+The resulting parameter set minimizes the discrepancy between predictions and measurements for the supplied inputs.

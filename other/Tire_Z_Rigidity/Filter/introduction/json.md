@@ -1,31 +1,31 @@
-# Data Filter JSON 設定說明
+# Data Filter JSON Configuration
 
-## 📌 目的
+## 📌 Purpose
 
-本 JSON 檔用於控制輪胎資料過濾器的篩選邏輯。
+This JSON file controls how the tire data filter selects samples.
 
-它定義了：
+It defines the following constraints.
 
-* 各資料項目的數值範圍 (`min` / `max`)
-* 連續資料點數限制 (`n`)
-* 正負區段限制 (`pos_range` / `neg_range`)
-* 斜率限制 (`slope_min` / `slope_max`)
-* 依 fitting 階段分類資料
+* Value ranges for each data channel (`min` and `max`).
+* Minimum number of consecutive samples (`n`).
+* Positive and negative segment limits (`pos_range` and `neg_range`).
+* Slope limits (`slope_min` and `slope_max`).
+* Data grouping by fitting stage.
 
-你可以透過修改這個 JSON，**精準控制進入 Magic Formula fitting 的資料品質與工況分類**。
+Edit this file to **control which operating conditions and data enter Magic Formula fitting**.
 
 ---
 
-# 📂 JSON 結構總覽
+# 📂 JSON Structure
 
 ```json
 {
-  "分類名稱": {
-    "變數名稱": {
-      "子分類名稱": {
-        "min": 數值,
-        "max": 數值,
-        "n":   連續點數
+  "category_name": {
+    "variable_name": {
+      "subcategory_name": {
+        "min": value,
+        "max": value,
+        "n":   consecutive_samples
       }
     }
   }
@@ -34,22 +34,22 @@
 
 ---
 
-# 🧩 第一層：Fitting 階段分類
+# 🧩 Level 1. Fitting Stages
 
-例如：
+Example uses
 
 ```json
 "57_1"
 "23_234"
 ```
 
-這些代表不同的：
+These entries represent the following.
 
-* 測試 run
+* Test runs.
 * fitting stage
-* 不同模型建立階段
+* Different stages of model development.
 
-👉 若要新增 fitting 階段：
+To add a fitting stage, use the following structure.
 
 ```json
 "new_stage_name": {
@@ -59,19 +59,19 @@
 
 ---
 
-# 📊 第二層：物理變數分類
+# 📊 Level 2. Physical Variables
 
-常見變數：
+Common variables
 
-| 變數 | 意義  |
+| Variable | Description |
 | -- | --- |
-| FZ | 法向力 |
-| IA | 外傾角 |
-| P  | 胎壓  |
-| SA | 滑移角 |
-| SL | 滑移率 |
+| FZ | Normal force |
+| IA | Camber angle |
+| P | Inflation pressure |
+| SA | Slip angle |
+| SL | Slip ratio |
 
-若你要新增一個變數限制，例如限制 `V`：
+Use the following pattern to constrain another variable such as `V`.
 
 ```json
 "V": {
@@ -81,9 +81,9 @@
 
 ---
 
-# 🔢 第三層：數值區段限制 (min / max / n)
+# 🔢 Level 3. Value Limits (min, max, and n)
 
-範例：
+Examples
 
 ```json
 "FZ_10": {
@@ -93,19 +93,19 @@
 }
 ```
 
-### 參數說明
+### Parameters
 
-| 參數  | 功能           |
+| Parameter | Function |
 | --- | ------------ |
-| min | 下限           |
-| max | 上限           |
-| n   | 需連續滿足條件的資料點數 |
+| min | Lower bound |
+| max | Upper bound |
+| n | Number of consecutive samples that must meet the condition |
 
-# 🔁 正負斜率區段限制 (pos_range / neg_range)
+# 🔁 Positive and Negative Segment Limits (pos_range and neg_range)
 
-用於控制例如 SA、SL 這種需要分正負區間的變數。
+Use separate ranges for positive and negative values of variables such as SA and SL.
 
-範例：
+Examples
 
 ```json
 "SA": {
@@ -114,25 +114,25 @@
 }
 ```
 
-### 用途
+### Uses
 
-* 只取固定 slip angle 工況
-* 保證左右對稱資料
-* 控制 steady-state cornering 區段
+* Retain only operating conditions with a fixed slip angle.
+* Keep data symmetric across left and right turns.
+* Select steady-state cornering segments.
 
 ---
 
-# 📈 斜率限制 (slope_min / slope_max)
+# 📈 Slope Limits (slope_min and slope_max)
 
-範例：
+Examples
 
 ```json
 "slope_min": -0.05,
 "slope_max": -0.00
 ```
 
-### 用途
+### Uses
 
-* 只取穩定變化區段
-* 排除轉場資料
-* 排除 ramp-up / ramp-down 過程
+* Retain segments where the variable changes at a steady rate.
+* Exclude transitions between operating conditions.
+* Exclude ramp-up and ramp-down events.

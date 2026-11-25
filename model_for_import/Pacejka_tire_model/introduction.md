@@ -1,13 +1,13 @@
 # Pacejka_MF_model
-## 簡介
-Pacejka_MF_model是個輪胎模型，如果無法理解他怎麼運作就把它當作一個輸出可以產出輪胎力矩與力量的黑盒子工具。使用方法如下:
-* [檔案位置](Demo.py)
+## Introduction
+Pacejka_MF_model predicts tire forces and moments. You can call it using the API in the following example.
+* [Demo source file](Demo.py)
 ```python
-from model import api # 套用api接口
+from model import api  # Import the model API
 
-tir_params = api.load_tir("D2704_mf612.tir") # 載入tir參數檔案
+tir_params = api.load_tir("D2704_mf612.tir")  # Load the tire parameter file
 
-MF = api.CalculationInput( # 建立MF物件函數
+MF = api.CalculationInput(  # Set the Magic Formula inputs
             FZ=800,
             SA=1,
             SL=0.25,
@@ -16,17 +16,17 @@ MF = api.CalculationInput( # 建立MF物件函數
             pressure=80000,
             tir_params=tir_params
         )
-# MF_Universal_solver可以解出 FX FY MX RRT MZ等多個輸出，第一個參數為輸出類型，第二個參數為MF物件
-Fx = api.MF_Universal_solver("FX", MF) # 呼叫MF_Universal_solver函數，計算FX，第一個參數為"FX"，第二個參數為MF物件
-Fy = api.MF_Universal_solver("FY", MF) # 呼叫MF_Universal_solver函數，計算FY，第一個參數為"FY"，第二個參數為MF物件
+# MF_Universal_solver returns FX, FY, MX, RRT, or MZ. Pass the output code and the MF input object.
+Fx = api.MF_Universal_solver("FX", MF)  # Calculate longitudinal force
+Fy = api.MF_Universal_solver("FY", MF)  # Calculate lateral force
 
-print("Fx:", Fx) # 印出
+print("Fx:", Fx)  # Print the result
 print("Fy:", Fy)
 
 ```
-## 其他小工具
-本模組是輪胎擬合模組magic formula fitting中的精簡工具，這個資料夾中只擷取部分內容
+## Supporting Tools
+This package contains a subset of the tools from the full Magic Formula fitting project.
 
-1. [圖形測試器](introduction/MF_tester.md) : 用於簡單分析輪胎性能。
-2. [測試結果圖表](Figures/MF_plt.md) : 上個工具的輸出結果，執行之後就會自動更新。
-3. [輪胎模型](introduction/magic_formula_model.md) : 輪胎模型說明，如果想了解模組運作可以看這個。
+1. The [plotting tester](introduction/MF_tester.md) provides a quick way to analyze tire performance.
+2. The [example plots](Figures/MF_plt.md) are updated when you run the plotting tester.
+3. The [tire model documentation](introduction/magic_formula_model.md) explains how the model works.

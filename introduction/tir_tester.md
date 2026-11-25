@@ -2,23 +2,23 @@
 layout: base
 ---
 
-# Magic Formula 模型比較與結果視覺化工具
+# Magic Formula Model Comparison and Visualization
 
-[本模組](../tir_tester.py)用於：
+[This module](../tir_tester.py) performs the following tasks.
 
-* 載入已過濾之輪胎量測資料
-* 載入兩組 `.tir` 輪胎模型參數
-* 計算 Magic Formula 輸出
-* 與實測數據比較
-* 視覺化模型差異
+* Load filtered tire measurement data.
+* Load two `.tir` parameter sets.
+* Evaluate the Magic Formula models.
+* Compare predictions against measured data.
+* Visualize differences between models.
 
-此工具主要用於：
+Typical uses
 
-> ✔ 擬合前後模型比較
-> ✔ 不同版本 TIR 對比
-> ✔ 驗證 MF 參數修正效果
+> ✔ Compare models before and after fitting.
+> ✔ Compare different TIR versions.
+> ✔ Verify the effect of changes to MF parameters.
 
-# 📦 依賴模組
+# 📦 Dependencies
 
 * `model.CalculationInput`
 * `MF_Universal_solver`
@@ -29,19 +29,19 @@ layout: base
 
 ---
 
-# 🔧 功能說明
+# 🔧 Features
 
-## 1️⃣ 載入 MF 資料
+## 1️⃣ Loading MF Data
 
 ```python
 load_mf_data(filename)
 ```
 
-功能：
+What it does
 
-* 從 `data/Filtered_data/` 讀取資料
-* 支援 `.csv` / `.xlsx`
-* 回傳：
+* Read data from `data/Filtered_data/`.
+* Read `.csv` or `.xlsx` files.
+* Return the following.
 
 ```python
 {
@@ -50,48 +50,48 @@ load_mf_data(filename)
   "SL": np.ndarray,
   "IA": np.ndarray,
   "P": np.ndarray,
-  "FX" 或 "FY": np.ndarray
+  "FX" or "FY": np.ndarray
 }
 ```
 
 ---
 
-### 📌 資料需求
+### 📌 Required Data
 
-資料需包含：
+The input data must contain the following fields.
 
 ```
-FZ      垂直載重
+FZ      Vertical load
 SA      Slip Angle
 SL      Slip Ratio
 IA      Camber
 P       Inflation Pressure
-FX/FY   量測力
+FX/FY   Measured force
 ```
 
 ---
 
-## 2️⃣ 模型計算流程
+## 2️⃣ Evaluating the Models
 
 ```python
 MF = model.CalculationInput(...)
 F_array = MF_Universal_solver(Fit_type, MF)
 ```
 
-流程：
+Calculation steps
 
-1. 將資料包裝成 `CalculationInput`
-2. 呼叫 `MF_Universal_solver`
-3. 計算對應輸出力
+1. Wrap the data in a `CalculationInput` object.
+2. Call `MF_Universal_solver`.
+3. Calculate the corresponding output force.
 
-支援：
+Supported outputs
 
-* `"FX"` → 縱向力
-* `"FY"` → 側向力
+* `"FX"` produces longitudinal force.
+* `"FY"` produces lateral force.
 
 ---
 
-## 3️⃣ 比較函式
+## 3️⃣ Comparison Function
 
 ```python
 plot_data(df, tir_params1, tir_params2, Fit_type)
@@ -99,9 +99,9 @@ plot_data(df, tir_params1, tir_params2, Fit_type)
 
 ---
 
-### 📌 設計目的
+### 📌 Purpose
 
-比較：
+Compare the following series.
 
 ```
 Measured Force
@@ -113,35 +113,35 @@ Model 2 Prediction
 
 ---
 
-### 📌 計算步驟
+### 📌 Calculation Steps
 
-對兩組 TIR：
+Collect the two TIR parameter sets.
 
 ```python
 tir_params_list = [tir_params1, tir_params2]
 ```
 
-逐一：
+For each parameter set, follow these steps.
 
-* 建立 MF 輸入物件
-* 計算預測值
-* 存入 F_lists
+* Build the MF input object.
+* Compute the predicted values.
+* Store the results in F_lists.
 
 ---
 
-### 📌 視覺化內容
+### 📌 Plot Contents
 
-* 黑色實線 → 實測值
-* 虛線 → 模型 1
-* 點虛線 → 模型 2
+* Black solid line for measured values.
+* Dashed line for Model 1.
+* Dash-dot line for Model 2.
 
-X 軸：
+X-axis
 
 ```
-資料索引
+Data point index
 ```
 
-Y 軸：
+Y-axis
 
 ```
 Force [N]
@@ -149,7 +149,7 @@ Force [N]
 
 ---
 
-# 🚀 執行方式
+# 🚀 Usage
 
 ```python
 if __name__ == "__main__":
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
 ---
 
-## Step 1：讀取資料
+## Step 1. Read the Data
 
 ```python
 df = load_mf_data("B2356run57_processed5.csv")
@@ -165,21 +165,21 @@ df = load_mf_data("B2356run57_processed5.csv")
 
 ---
 
-## Step 2：讀取兩組 TIR
+## Step 2. Load Two TIR Parameter Sets
 
 ```python
 tir_params1 = MF_tester.load_tir("data/tir/D2704_mf612.tir")
 tir_params2 = MF_tester.load_tir("data/tir/tir_Fitting_results.tir")
 ```
 
-常見用途：
+Typical inputs
 
-* `tir_params1` → 原始 TTC / 官方模型
-* `tir_params2` → 自己擬合結果
+* `tir_params1` contains the original TTC or manufacturer model.
+* `tir_params2` contains the fitted parameters.
 
 ---
 
-## Step 3：畫圖比較
+## Step 3. Plot the Comparison
 
 ```python
 plot_data(df, tir_params1, tir_params2, "FY")

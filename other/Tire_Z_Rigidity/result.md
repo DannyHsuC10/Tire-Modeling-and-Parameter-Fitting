@@ -1,8 +1,8 @@
 # Vertical Stiffness Fitting Results
 
-TTC剛性: 99.1699 N/mm
+TTC stiffness: 99.1699 N/mm
 
-## 線性回歸結果 
+## Linear Regression Results 
 
 ![RL Comparison](Figures/Vertical_stiffness.png)
 
@@ -10,13 +10,13 @@ R0 (Free Radius) = 203.200000
 
 Vertical stiffness k = 55.8092 N/mm
 
-預先負載 b = 284.7518
+Preload b = 284.7518
 
-預載壓縮 dr0 = 5.1022
+Preload deflection dr0 = 5.1022
 
 ***
 
-## 線性回歸結果 (through origin) 
+## Linear Regression Results Through the Origin 
 
 ![RL Comparison](Figures/Vertical_stiffness_origin.png)
 

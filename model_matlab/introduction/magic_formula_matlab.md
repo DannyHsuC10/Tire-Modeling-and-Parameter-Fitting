@@ -2,47 +2,47 @@
 layout: base
 ---
 
-# MATLAB Magic Formula API 說明文件
+# MATLAB Magic Formula API
 
-## 📌 模型定位
+## 📌 Model Scope
 
-本模組為 **Magic Formula 6.1.2 (MF6.1.2)** 的 MATLAB 實現版本，提供統一 API 介面：[MF API](../MF_api.m)
+This module implements **Magic Formula 6.1.2 (MF6.1.2)** in MATLAB and exposes a unified [MF API](../MF_api.m).
 
 ```
 MF_api(cmd, FZ, SA, SL, IA, P, mf_file)
 ```
-此 MATLAB API 設計重點為：
+The design goal for the MATLAB API is to
 
-> 將複雜的 MF6.1.2 公式封裝成單一簡潔接口
+> wrap the MF6.1.2 equations in a single interface.
 
-讓使用者只需：
+To evaluate the model, call the API as shown below.
 
 ```
 MF_api("FX", ...)
 ```
 
-即可取得結果，而不需理解內部所有公式細節。計算結果與python版本幾乎相同，所以這部分主要介紹使用方法。
+The MATLAB and Python models produce nearly identical results. This guide focuses on calling the MATLAB API.
 
-## Magic formula 公式
+## Magic Formula Equations
 
-### 綜合工況
+### Combined Slip
 
 1. [Fx](../MF612_Fx.m)
 1. [Fy](../MF612_Fy.m)
 1. [Mx](../MF612_Mx.m)
 1. [Mz](../MF612_Mz.m)
 
-### 純工況
+### Pure Slip
 
-因為內容重複通常不會直接使用，所以api沒有直接進行連接。
+The API calls the combined-slip routines. The pure-slip routines are rarely called on their own because much of their implementation overlaps.
 
 1. [Fx0](../Base_func/MF612_Fx0.m)
 1. [Fy0](../Base_func/MF612_Fy0.m)
 1. [Mz0](../Base_func/MF612_Mz0.m)
 
-## 🎯 核心 API 介面
+## 🎯 Core API
 
-### 函式原型
+### Function Signature
 
 ```matlab
 function out = MF_api(cmd, FZ, SA, SL, IA, P, mf_file)
@@ -50,46 +50,46 @@ function out = MF_api(cmd, FZ, SA, SL, IA, P, mf_file)
 
 ---
 
-### 📥 輸入參數
+### 📥 Inputs
 
-| 參數        | 單位     | 說明                    |
+| Parameter | Unit | Description |
 | --------- | ------ | --------------------- |
-| `cmd`     | string | 指令："Fx" / "Fy" / "Mz" |
-| `FZ`      | N      | 法向力                   |
-| `SA`      | deg    | 側偏角                   |
-| `SL`      | -      | 縱滑比                   |
-| `IA`      | deg    | 外傾角                   |
-| `P`       | Pa     | 胎壓                    |
-| `mf_file` | string | TIR 檔案路徑              |
+| `cmd` | string | Output selector. Use "Fx", "Fy", or "Mz". |
+| `FZ` | N | Normal force |
+| `SA` | deg | Slip angle |
+| `SL` | - | Longitudinal slip ratio |
+| `IA` | deg | Camber angle |
+| `P` | Pa | Inflation pressure |
+| `mf_file` | string | Path to the TIR file |
 
 ---
 
-### 📤 輸出
+### 📤 Outputs
 
-| cmd    | 回傳   |
+| cmd | Return value |
 | ------ | ---- |
-| `"FX"` | 縱向力  |
-| `"FY"` | 橫向力  |
-| `"MZ"` | 回正力矩 |
-| `"MX"` | 翻轉力矩 |
+| `"FX"` | Longitudinal force |
+| `"FY"` | Lateral force |
+| `"MZ"` | Aligning moment |
+| `"MX"` | Overturning moment |
 
-##  CalculationInput 功能
+## CalculationInput
 
 ```matlab
 function MF = CalculationInput(FZ,SA,SL,IA,P,tir_path)
 ```
 
-功能：
+What it does
 
-1. 讀取 `.tir` 檔
-2. 封裝輸入工況
-3. 建立 MF 計算所需完整 struct
+1. Read the `.tir` file.
+2. Group the operating inputs.
+3. Build the MATLAB struct required by the Magic Formula calculations.
 
 ---
 
-###  自動設定的關鍵物理參數
+### Physical Parameters Set Automatically
 
-| 參數       | 來源              |
+| Parameter | Source |
 | -------- | --------------- |
 | `MF.PIO` | NOMPRES         |
 | `MF.FZO` | FNOMIN          |
@@ -100,9 +100,9 @@ function MF = CalculationInput(FZ,SA,SL,IA,P,tir_path)
 
 ### Lambda Scaling Factors
 
-本模型保留完整 λ scaling 架構：
+The model retains the full λ scaling framework.
 
-例如：
+Example uses
 
 ```matlab
 MF.lambdaMuyMi = 1;
@@ -110,51 +110,51 @@ MF.lambdaKya = 1;
 MF.lambdaMuxMi = 1;
 ```
 
-用途：
+Use the scaling factors to adjust the model.
 
-* 模型調整
-* 模擬抓地力降低 (例如改為 0.6)
-* 進行 sensitivity analysis
-* 實車校正
+* Tune the model.
+* Simulate reduced grip, for example with a scaling factor of 0.6.
+* Run a sensitivity analysis.
+* Calibrate the model against a real vehicle.
 
 ---
 
-#### 常用可調整參數
+#### Common Adjustable Parameters
 
-| 參數            | 意義                  |
+| Parameter | Description |
 | ------------- | ------------------- |
-| `lambdaMuyMi` | 橫向峰值摩擦係數            |
-| `lambdaMuxMi` | 縱向峰值摩擦係數            |
+| `lambdaMuyMi` | Lateral peak friction coefficient |
+| `lambdaMuxMi` | Longitudinal peak friction coefficient |
 | `lambdaKya`   | Cornering stiffness |
 | `lambdaCy`    | Shape factor        |
 | `lambdaEy`    | Curvature factor    |
-| `epsilonX/Y`  | 數值穩定項               |
+| `epsilonX/Y` | Numerical stabilization term |
 
 ---
 
-## 📂 TIR 檔讀取流程
+## 📂 Reading a TIR File
 
 ### load_tir()
 
-功能：
+What it does
 
-* 逐行解析 TIR 檔案
-* 自動忽略：
+* Parse the TIR file line by line.
+* Skip the following automatically.
 
-  * 註解 `$`
+  * Comments marked with `$`.
   * Section header `[SECTION]`
-* 將 key-value 轉成 struct
+* Store the key-value pairs in a struct.
 
 ---
 
 ### parse_value()
 
-功能：
+What it does
 
-* 嘗試將字串轉為數值
-* 若失敗則保留字串
+* Try to parse each value as a number.
+* Keep the value as a string if parsing fails.
 
-## 📊 使用範例
+## 📊 Usage Example
 
 ```matlab
 Fx = MF_api("FX", 800, 0.0, 0.1, 0.0, 80000, "MF612.tir");
@@ -164,15 +164,15 @@ Fy = MF_api("FY", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
 Mz = MF_api("MZ", 800, 3.0, 0.0, 0.0, 80000, "MF612.tir");
 ```
 
-## 與 Python 版本差異
+## Differences from the Python Version
 
 | MATLAB         | Python              |
 | -------------- | ------------------- |
 | function-based | class-based         |
 | persistent     | instance cache      |
 | struct         | dataclass           |
-| 直接呼叫函式         | class static method |
+| Direct function call | Class static method |
 
-## 改進方向
-* 效率有待提升，目前計算速度真的太慢。
-* 多加一些畫圖工具
+## Planned Improvements
+* Improve calculation performance.
+* Add more plotting tools.

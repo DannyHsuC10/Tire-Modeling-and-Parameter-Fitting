@@ -2,153 +2,153 @@
 layout: base
 ---
 
-# Magic Formula 分段擬合主程式說明
+# Main Script for Staged Magic Formula Fitting
 
-本程式為輪胎 **Magic Formula (MF)** 模型擬合主控腳本，負責：
+This script controls parameter fitting for the **Magic Formula (MF)** tire model.
 
-[位置](../fitting.py)
+[Source file](../fitting.py)
 
-* 讀取已預處理之輪胎量測資料
-* 載入與管理擬合參數（含上下限）
-* 依 Stage 分段進行參數最佳化
-* 計算誤差指標（RMS / COST）
-* 更新參數檔案
-* 輸出為 `.tir` 格式
+* Read preprocessed tire measurement data.
+* Load and manage fitting parameters and their bounds.
+* Optimize the active parameters for each stage.
+* Compute error metrics (RMS and COST).
+* Update the parameter files.
+* Export the results as a `.tir` file.
 
-此腳本為整個 MF 擬合流程的核心控制器。
-
----
-
-# 📦 系統架構概念
-
-```
-原始資料 → filter → tir_tester → 分段擬合 → 更新 CSV → 轉出 TIR
-```
-
-主要依賴模組：
-
-* [filter](../Filter/introduction/Filter.md)：資料預處理（本檔未直接呼叫函式，但需確保資料已清洗）
-* [tir_tester](tir_tester.md)：讀取 MF 測試資料
-* [MF_Fitter](../Fitter/introduction/MF_fitter.md)：負責參數最佳化
-* [csv_to_tir](csv_to_tir.md)：將最終 CSV 轉換為 TIR 檔案
+This script coordinates the full MF fitting workflow.
 
 ---
 
-# 📁 資料夾結構
+# 📦 Workflow Overview
+
+```
+Raw data → filter → tir_tester → Staged fitting → Update the CSV → Export TIR
+```
+
+Main dependencies
+
+* [filter](../Filter/introduction/Filter.md) preprocesses the test data. Run data cleaning before running this script.
+* [tir_tester](tir_tester.md) reads MF test data.
+* [MF_Fitter](../Fitter/introduction/MF_fitter.md) optimizes the parameters.
+* [csv_to_tir](csv_to_tir.md) converts the final CSV to a TIR file.
+
+---
+
+# 📁 Directory Structure
 
 ```
 magic_formula/
 │
 ├── data/
 │   └── Fitting_data/
-│       ├── Fitting_process.csv   # 擬合參數
-│       └── Fitting_Limits.csv    # 模板檔
+│       ├── Fitting_process.csv   # Fitting parameters
+│       └── Fitting_Limits.csv    # Template file
 │
 ├── Fitter/
 ├── model/
 ├── filter.py
 ├── tir_tester.py
-└── main_fitting_script.py  ← 本檔
+└── main_fitting_script.py  ← Main script
 ```
 
 ---
 
-# 🔧 主要功能說明
+# 🔧 Main Functions
 
 ---
 
-## 1️⃣ 載入擬合參數
+## 1️⃣ Loading Fitting Parameters
 
 ```python
 load_fit_parameters(filename)
 ```
 
-功能：
+What it does
 
-* 從 `data/Fitting_data/` 載入擬合參數
-* 支援 `.csv` / `.xlsx`
-* 若檔案不存在，自動複製模板檔
+* Load the fitting parameters from `data/Fitting_data/`.
+* Read `.csv` or `.xlsx` files.
+* Copy the template automatically if the parameter file is missing.
 
-回傳格式：
+Return format
 
 ```python
 {
-  "PCX1": {"x0": 初始值, "lb": 下限, "ub": 上限},
+  "PCX1": {"x0": initial_value, "lb": lower_bound, "ub": upper_bound},
   ...
 }
 ```
 
 ---
 
-## 2️⃣ 建立 MF 初始參數
+## 2️⃣ Building the Initial MF Parameters
 
 ```python
 build_mf_params(fit_params)
 ```
 
-功能：
+What it does
 
-* 只取出 `x0` 作為初始 MF 參數
-* 產生可直接餵入 MF 計算之參數 dict
+* Use the `x0` values as the initial MF parameters.
+* Build a dictionary that can be passed directly to the MF calculations.
 
 ---
 
-## 3️⃣ 分段參數選取
+## 3️⃣ Selecting Parameters by Stage
 
 ```python
 build_fit_params_for_stages(full_fit_params, STAGES, stages)
 ```
 
-用途：
+The function selects and returns the parameters for a fitting stage.
 
-* 依 Stage 取出該段要擬合的參數
-* 回傳：
+* Select the parameters fitted in the current stage.
+* Return the following.
 
-  * 該 Stage 專用 fit_params
-  * active_keys（最佳化用參數順序）
-
----
-
-# 🧩 Stage 結構設計
-
-本程式採用 **分段擬合策略**。
+  * The stage-specific fit_params.
+  * active_keys, the order of parameters passed to the optimizer.
 
 ---
 
-## FX 分段
+# 🧩 Fitting Stage Design
+
+The script fits the model in multiple stages.
+
+---
+
+## FX Fitting Stages
 
 ```
-Stage 1 → 基本形狀 + 剛性 + 峰值
-Stage 2 → Load 與 Camber 變化
-Stage 3 → 駕駛狀態曲率修正
-Stage 4 → Load 影響修正
-Stage 5 → Combined slip 參數
+Stage 1 → Basic shape, stiffness, and peak force
+Stage 2 → Load and camber variation
+Stage 3 → Curvature correction under driving conditions
+Stage 4 → Load-dependent correction
+Stage 5 → Combined-slip parameters
 ```
 
 ---
 
-## FY 分段
+## FY Fitting Stages
 
-包含：
+These stages cover the following parameters.
 
-* 主側向力參數
-* 負載修正
-* 高階修正
+* Primary lateral force parameters.
+* Load corrections.
+* Higher-order corrections.
 * Combined slip
 
 ---
 
-# 🚀 執行流程
+# 🚀 Running the Converter
 
 ---
 
-## Step 1：讀取資料
+## Step 1. Read the Data
 
 ```python
 F_data_1 = tir_tester.load_mf_data(...)
 ```
 
-資料需包含：
+The input data must contain the following fields.
 
 ```
 FZ
@@ -156,35 +156,35 @@ SL
 SA
 IA
 P
-FX 或 FY
+FX or FY
 ```
 
 ---
 
-## Step 2：選擇擬合類型
+## Step 2. Select the Fitting Type
 
 ```python
-Fit_type = "FX"  # 或 "FY"
+Fit_type = "FX"  # or "FY"
 selected_stages = [1,2,3,4,5]
 ```
 
 ---
 
-## Step 3：分段迭代擬合
+## Step 3. Fit the Parameters Stage by Stage
 
-核心流程：
+Fitting loop
 
 ```python
 for stage_num in selected_stages:
 ```
 
-每一 Stage：
+For each stage, do the following.
 
-1. 選擇對應資料
-2. 建立 MF_inputs
-3. 建立 Fitter
-4. 取得 active parameters
-5. 呼叫：
+1. Select the relevant data.
+2. Create MF_inputs.
+3. Initialize the Fitter.
+4. Get the active parameters.
+5. Call the optimizer.
 
 ```python
 result = fitter.fit(...)
@@ -192,9 +192,9 @@ result = fitter.fit(...)
 
 ---
 
-# 📊 誤差指標
+# 📊 Error Metrics
 
-每一 Stage 會輸出：
+Each stage reports the following metrics.
 
 ```
 N used by optimizer
@@ -204,7 +204,7 @@ COST
 RMS %
 ```
 
-定義：
+Definitions
 
 $$RMS = \sqrt{\sum(\Delta x²)}$$
 
@@ -215,35 +215,35 @@ $$cost = \sum(\Delta x)$$
 $$RMS\% = RMS/\max{(x)}$$
 ---
 
-# 💾 安全更新參數檔
+# 💾 Safely Updating Parameter Files
 
 ```python
 update_x0(mf_params_current, SAVE_DIR/"Fitting_process.csv")
 ```
 
-設計特點：
+The update follows this sequence.
 
-* 先寫入 `.tmp`
-* 再 replace 原檔
-* 避免寫檔中斷造成檔案毀損
+* Write to a `.tmp` file first.
+* Replace the original file with the temporary file.
+* This protects the original file if a write is interrupted.
 
 ---
 
-# 🔄 最終輸出
+# 🔄 Final Output
 
 ```python
 import csv_to_tir
 ```
 
-將更新後之 CSV 轉為 `.tir` 檔
-供：
+Convert the updated CSV to a `.tir` file.
+The TIR file can be used for the following.
 
 
 ---
 
-# ⚙ 可客製化部分
+# ⚙ Customization
 
-你可以修改：
+You can change the following settings.
 
 ```python
 Fit_type
@@ -251,18 +251,18 @@ selected_stages
 F_data_list
 ```
 
-即可快速切換不同擬合策略。
+Adjust these settings to switch between fitting strategies.
 
 ---
 
-# 🏁 完整流程總結
+# 🏁 Full Workflow
 
 ```
-讀資料
-→ 讀參數
-→ 分段擬合
-→ 計算誤差
-→ 更新CSV
-→ 轉TIR
-→ 完成
+Read the data
+→ Load the parameters
+→ Staged fitting
+→ Compute the error
+→ Update the CSV
+→ Export TIR
+→ Done
 ```
