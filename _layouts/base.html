@@ -1,11 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+{%- assign project_title = site.title -%}
+{%- assign platform_tools = 'https://dannyhsuc10.github.io/FSAE-Design-Platform/#tools' -%}
+{%- assign repository = 'https://github.com/DannyHsuC10/Tire-Modeling-and-Parameter-Fitting' -%}
+{%- assign is_home = false -%}
+{%- if page.url == '/' or page.url == '/index.html' -%}
+  {%- assign is_home = true -%}
+  {%- assign readme_heading = '# Tire-Modeling-and-Parameter-Fitting' | markdownify | strip -%}
+  {%- assign article = content | replace_first: readme_heading, '' -%}
+  {%- capture model_url -%}{% link model/introduction/magic_formula_model.md %}{%- endcapture -%}
+  {%- capture fitting_url -%}{% link introduction/fitting.md %}{%- endcapture -%}
+  {%- capture testing_url -%}{% link introduction/tir_tester.md %}{%- endcapture -%}
+{%- else -%}
+  {%- assign article = content -%}
+{%- endif -%}
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang }}">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111d31">
+  <title>{% unless is_home or page.title == empty or page.title == nil %}{{ page.title | escape }} · {% endunless %}{{ project_title | escape }}</title>
   <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
-  <title>{{ page.title }}</title>
-
-  <!-- MathJax -->
   <script>
     window.MathJax = {
       tex: {
@@ -14,35 +28,61 @@
       }
     };
   </script>
-  <script defer
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-
 <body>
-
-  <!-- ===== 開頭段 (在外層容器外) ===== -->
-  <header class="page-intro">
-    <h1 class="page-title">Danny</h1>
+  <a class="skip-link" href="#content">跳至主要內容</a>
+  <header class="site-header">
+    <div class="site-container header-inner">
+      <a class="brand" href="{{ '/' | relative_url }}">
+        <span class="brand-mark" aria-hidden="true">MF</span>
+        <span class="brand-text">
+          <span class="brand-platform">FSAE Design Platform</span>
+          <span class="brand-title">Tire Modeling</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="專案導覽">
+        <a class="button" href="{{ platform_tools }}">返回工具庫</a>
+        <a class="button button-primary" href="{{ repository }}">GitHub</a>
+      </nav>
+    </div>
   </header>
 
-  <!-- ===== 內容區塊 (小框框) ===== -->
-  <div class="content">
-    <main id="content" class="markdown-body">
-      {{ content }}
-    </main>
-  </div>
+  <main id="content" class="site-container page-main" tabindex="-1">
+    {% if is_home %}
+      <header class="project-intro" aria-labelledby="tire-modeling-and-parameter-fitting">
+        <h1 id="tire-modeling-and-parameter-fitting" lang="en">{{ project_title | escape }}</h1>
+        <p>使用 Python 或 MATLAB 建立 Magic Formula 輪胎模型，從量測資料擬合參數、輸出 TIR 檔並驗證模型。</p>
+      </header>
 
-  <!-- ===== 結尾段 (在外層容器外) ===== -->
-  <footer class="page-end">
-    <p>
-      ← <a href="{{ '/' | relative_url }}">Back to HOME</a>
-    </p>
+      <nav class="docs-shortcuts" aria-label="常用文件">
+        <a class="shortcut" href="{{ model_url | relative_url }}">
+          <span class="shortcut-title">輪胎模型</span>
+          <span class="shortcut-description">查閱 Python 版 Magic Formula 模型。</span>
+        </a>
+        <a class="shortcut" href="{{ fitting_url | relative_url }}">
+          <span class="shortcut-title">參數擬合</span>
+          <span class="shortcut-description">從資料預處理到分段擬合與 TIR 輸出。</span>
+        </a>
+        <a class="shortcut" href="{{ testing_url | relative_url }}">
+          <span class="shortcut-title">模型驗證</span>
+          <span class="shortcut-description">比較 TIR 模型輸出與實驗量測資料。</span>
+        </a>
+      </nav>
+    {% else %}
+      <a class="docs-home" href="{{ '/' | relative_url }}">文件首頁</a>
+    {% endif %}
+
+    <article class="markdown-body">
+      {{ article }}
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-container footer-inner">
+      <span>FSAE Design Platform</span>
+      <a href="{{ '/' | relative_url }}">輪胎模型文件</a>
+    </div>
   </footer>
-
-
 </body>
-
 </html>
-
-

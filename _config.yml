@@ -1,1 +1,9 @@
-theme: jekyll-theme-cayman
+title: Tire Modeling & Parameter Fitting
+lang: zh-Hant
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: base
